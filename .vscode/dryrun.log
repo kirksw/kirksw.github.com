@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/kirk/Projects/kirksw.github.com'
+cd hugo && hugo -D server
+make: Leaving directory '/home/kirk/Projects/kirksw.github.com'
+ 

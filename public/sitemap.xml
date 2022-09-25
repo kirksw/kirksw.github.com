@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://kirksw.github.io/posts/</loc>
+    <lastmod>2022-09-11T10:14:31+02:00</lastmod>
+  </url><url>
+    <loc>https://kirksw.github.io/posts/python/</loc>
+    <lastmod>2022-09-11T10:14:31+02:00</lastmod>
+  </url><url>
+    <loc>https://kirksw.github.io/</loc>
+    <lastmod>2022-09-04T15:40:16+02:00</lastmod>
+  </url><url>
+    <loc>https://kirksw.github.io/archives/</loc>
+  </url><url>
+    <loc>https://kirksw.github.io/categories/</loc>
+  </url><url>
+    <loc>https://kirksw.github.io/search/</loc>
+  </url><url>
+    <loc>https://kirksw.github.io/tags/</loc>
+  </url>
+</urlset>
