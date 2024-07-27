@@ -9,6 +9,6 @@
       <link>https://kirksw.github.io/logo.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="https://kirksw.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language><atom:link href="https://kirksw.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Data solutions for a modern world on MDS</title>
-    <link>http://localhost:1313/</link>
+    <link>https://kirksw.github.io/</link>
     <description>Recent content in Data solutions for a modern world on MDS</description>
     <image>
-      <url>http://localhost:1313/logo.png</url>
-      <link>http://localhost:1313/logo.png</link>
+      <url>https://kirksw.github.io/logo.png</url>
+      <link>https://kirksw.github.io/logo.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 04 Sep 2022 15:40:16 +0200</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 04 Sep 2022 15:40:16 +0200</lastBuildDate><atom:link href="https://kirksw.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Road to Declarative Systems</title>
-      <link>http://localhost:1313/posts/road-to-declarative/</link>
+      <link>https://kirksw.github.io/posts/road-to-declarative/</link>
       <pubDate>Sat, 27 Jul 2024 12:50:29 +0200</pubDate>
       
-      <guid>http://localhost:1313/posts/road-to-declarative/</guid>
+      <guid>https://kirksw.github.io/posts/road-to-declarative/</guid>
       <description>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.
 Why declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.</description>
       <content:encoded><![CDATA[<p>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.</p>
@@ -76,10 +76,10 @@ Why declarative systems? Lets say you were tasked with ensuring that all cloud s
     
     <item>
       <title>Python Packaging with Poetry</title>
-      <link>http://localhost:1313/posts/python-packaging-part1/</link>
+      <link>https://kirksw.github.io/posts/python-packaging-part1/</link>
       <pubDate>Sun, 11 Sep 2022 10:14:31 +0200</pubDate>
       
-      <guid>http://localhost:1313/posts/python-packaging-part1/</guid>
+      <guid>https://kirksw.github.io/posts/python-packaging-part1/</guid>
       <description>It&amp;rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of setup.py, setup.cfg and pyproject.toml. Before we look at these, it is important to first make sure we properly understand python modules and packages.
 Python Modules In python a module is simply a file with a .</description>
       <content:encoded><![CDATA[<p>It&rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of <code>setup.py</code>, <code>setup.cfg</code> and <code>pyproject.toml</code>. Before we look at these, it is important to first make sure we properly understand python modules and packages.</p>

@@ -9,30 +9,93 @@
       <link>https://kirksw.github.io/logo.png</link>
     </image>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <lastBuildDate>Sun, 11 Sep 2022 10:14:31 +0200</lastBuildDate><atom:link href="https://kirksw.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Sat, 27 Jul 2024 12:50:29 +0200</lastBuildDate><atom:link href="https://kirksw.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Python Packages in 2022</title>
-      <link>https://kirksw.github.io/posts/python/</link>
+      <title>Road to Declarative Systems</title>
+      <link>https://kirksw.github.io/posts/road-to-declarative/</link>
+      <pubDate>Sat, 27 Jul 2024 12:50:29 +0200</pubDate>
+      
+      <guid>https://kirksw.github.io/posts/road-to-declarative/</guid>
+      <description>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.
+Why declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.</description>
+      <content:encoded><![CDATA[<p>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.</p>
+<h2 id="why-declarative-systems">Why declarative systems?</h2>
+<p>Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.</p>
+<p>Perhaps you would start by documenting the current state of things, probably by polling this data from an api, then you would need to figure out what needs to be changed, and then finally how to change the state of things to match the new standards.</p>
+<p>However imagine if the state of these buckets was defined declaratively as code, you then could easily see the state as defined in the code, and then make changes to the code to match the new standards.</p>
+<p>Tooling like terraform, kubernetes, an nix are all examples of industry leading tooling that allow you to define the state of things in code.</p>
+<h2 id="introduction-to-terraform">Introduction to terraform</h2>
+<p>The big aha moment for me was when I started using terraform to manage Azure cloud infrastructure. Terraform uses a language called HCL (HashiCorp Configuration Language) to define the state, a simple example of this is shown below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="s2">&#34;resource&#34; &#34;azurerm_resource_group&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>     <span class="o">=</span> <span class="s2">&#34;example-resources&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  location</span> <span class="o">=</span> <span class="s2">&#34;West Europe&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;resource&#34; &#34;azurerm_storage_account&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>                     <span class="o">=</span> <span class="s2">&#34;examplestorageaccount&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  resource_group_name</span>      <span class="o">=</span> <span class="k">azurerm_resource_group</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">name</span>
+</span></span><span class="line"><span class="cl"><span class="n">  location</span>                 <span class="o">=</span> <span class="k">azurerm_resource_group</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">location</span>
+</span></span><span class="line"><span class="cl"><span class="n">  account_tier</span>             <span class="o">=</span> <span class="s2">&#34;Standard&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  account_replication_type</span> <span class="o">=</span> <span class="s2">&#34;LRS&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p>You can then run <code>terraform plan</code> to see what changes will be made to the state, and then <code>terraform apply</code> to make the changes if you are happy with the plan. No where in this code do we define how to make the changes, terraform figures this out for us, all thanks to the plethora of providers that are available.</p>
+<p>Now with infrastructure to check the state I can grep the codebase, and making a change is a simple as a pull request. Of course there are some challenges, as drift can occur due to external changes, but these can be mitigated with good practices.</p>
+<h2 id="down-the-nix-rabbit-hole">Down the nix rabbit hole</h2>
+<p>I have done a lot of distro hopping over the years, and could never really find one that allowed me to have the level of control I wanted over my system - letting me use bleeding edge software, but also ensuring that everything was stable. My arch system would always break due to some update to nvidia drivers, and my ubuntu system would always be out of date.</p>
+<p>Additionally to ensure that my development environment was consistent I made a dotfiles repo, which I would use to install all the software I needed on a new system. However this was always a pain as I used mac/wsl for work, and linux for personal use and had to make this work for all the systems.</p>
+<p>A then colleague of mine introduced me to nix, and I was blown away by the power of the system and was surprised it wasn&rsquo;t more popular. Nix uses a functional programming language to define the state of the system, and then uses the nix package manager to ensure that the system is in the desired state - this should be starting to sound familiar.</p>
+<p>I&rsquo;m not going to lie - it was a steep learning curve and the ecosystem is quite fragmented. There are nix flakes which introduces dependency locking, however it is still considered experimental even though most people are using them. Also there are partnering modules such as darwin-nix which manages mac clients and home-manage which manages setting up home environments (ala dotfiles). You also need to choose a release channel or choose unstable, I typically use the latest stable release but use overlays to get the latest software where required.</p>
+<p>Nix has finally enabled me to have a consistent and declarative development environment across all my systems (controlling software and configurations), and I can now easily install software on a new system by running a couple of commands. Day one is now a breeze I am up and running in minutes.</p>
+<h2 id="kubernetes">Kubernetes</h2>
+<p>Kubernetes is another example of a system which allows you to define the state of the system in code. You define the desired state in a yaml file called a manifest and then apply this to the cluster. Kubernetes will then figure out how to make the changes to the cluster to match the desired state. This like terraform allows you easily inspect the diff and know what changes will be made.</p>
+<p>I won&rsquo;t lie, kubernetes is a beast and there is a lot to learn, but the power of the system is undeniable. There are tools like helm and kustomize which allow templating/overlay type functionality the yaml manifests (which terraform and nix have built in because they are programming languages). Also there are tools like argo-cd which allow you to manage the state of the cluster in a gitops manner, meaning that it will constantly poll the git repo and ensure that the cluster is in the desired state (something that needs to be handled manually with terraform).</p>
+<h2 id="summary">Summary</h2>
+<p>I hope this post has given you some insight into the power of declaratively defining systems, and how they can be used to manage the state of things in a straightforward manner. I have only scratched the surface of the tools available, and I am excited to see what the future holds for this space.</p>
+<p>As with anything there is a trade-off in that more work needs to be put in upfront. Much like writing tests or cicd pipelines, the benefits are not immediately apparent, but over time the investment will pay off and you will be thanking yourself if you ever need to rebuild the system from scratch.</p>
+<p>Please let me know if you would like me to expand on any of the topics mentioned in this post.</p>
+<h2 id="references">References</h2>
+<h3 id="terraform">Terraform</h3>
+<p><a href="https://www.terraform.io/">terraform</a>
+<a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs">azure provider</a>
+<a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs">aws provider</a>
+<a href="https://registry.terraform.io/providers/hashicorp/google/latest/docs">gcp provider</a></p>
+<h3 id="nix">Nix</h3>
+<p><a href="https://github.com/kirksw/nixfiles-v2">my nix config</a>
+<a href="https://nixos.org/">nixos</a>
+<a href="https://nixos.wiki/wiki/Flakes">nix flakes</a>
+<a href="https://github.com/LnL7/nix-darwin">nix-darwin</a>
+<a href="https://nix-community.github.io/home-manager/">home-manager</a></p>
+<h3 id="kubernetes-1">Kubernetes</h3>
+<p><a href="https://kubernetes.io/">kubernetes</a>
+<a href="https://helm.sh/">helm</a>
+<a href="https://kustomize.io/">kustomize</a>
+<a href="https://argoproj.github.io/argo-cd/">argo-cd</a></p>
+]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>Python Packaging with Poetry</title>
+      <link>https://kirksw.github.io/posts/python-packaging-part1/</link>
       <pubDate>Sun, 11 Sep 2022 10:14:31 +0200</pubDate>
       
-      <guid>https://kirksw.github.io/posts/python/</guid>
+      <guid>https://kirksw.github.io/posts/python-packaging-part1/</guid>
       <description>It&amp;rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of setup.py, setup.cfg and pyproject.toml. Before we look at these, it is important to first make sure we properly understand python modules and packages.
 Python Modules In python a module is simply a file with a .</description>
       <content:encoded><![CDATA[<p>It&rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of <code>setup.py</code>, <code>setup.cfg</code> and <code>pyproject.toml</code>. Before we look at these, it is important to first make sure we properly understand python modules and packages.</p>
 <h3 id="python-modules">Python Modules</h3>
 <p>In python a module is simply a file with a <code>.py</code> extension which contains related code, which could be functions, classes, variables or etc.</p>
 <p>For example lets define a function to greet a user:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hello_name</span>(name):
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;hello </span><span style="color:#e6db74">{</span>name<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hello_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p>To have this function store in a welcome module, we just need to save this code in a file named <code>welcome.py</code>.</p>
 <p>This module can be used in one of two ways, either by importing the entire module, or importing a specific function. Never use <code>from module import *</code> as then you have no transparency on where certain functions/classes were imported from.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> welcome
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>welcome<span style="color:#f92672">.</span>hello_name(<span style="color:#e6db74">&#34;bob&#34;</span>) <span style="color:#75715e"># prints &#34;hello bob&#34;</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> welcome <span style="color:#f92672">import</span> hello_name
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>hello_name(<span style="color:#e6db74">&#34;tim&#34;</span>) <span style="color:#75715e"># prints &#34;hello tim&#34;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">welcome</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">welcome</span><span class="o">.</span><span class="n">hello_name</span><span class="p">(</span><span class="s2">&#34;bob&#34;</span><span class="p">)</span> <span class="c1"># prints &#34;hello bob&#34;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">welcome</span> <span class="kn">import</span> <span class="n">hello_name</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">hello_name</span><span class="p">(</span><span class="s2">&#34;tim&#34;</span><span class="p">)</span> <span class="c1"># prints &#34;hello tim&#34;</span>
 </span></span></code></pre></div><p>Module introduce several benefits:</p>
 <ul>
 <li>Improved development</li>
@@ -48,11 +111,11 @@ Python Modules In python a module is simply a file with a .</description>
 <h3 id="python-packages">Python Packages</h3>
 <p>Python collection of modules intended to be installed and used together. When developing a large application you will probably end up with multiple modules which need to be organized, this is what a package does.</p>
 <p>In python a package (or subpackage) is a folder containing one or more modules and a <code>__init__.py</code> file, which can be empty or contain some initialization code for the package.</p>
-<p><img loading="lazy" src="/posts/python/images/dairy_processing_package.png" type="" alt="python package hierachy"  /></p>
+<p><img loading="lazy" src="/posts/python-packaging-part1/images/dairy_processing_package.png" type="" alt="python package hierachy"  /></p>
 <p>We can import certain modules from any of these packages using dot notation. For example to import module_1 from the above package, we could use either of the following code snippets</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> dairy_processing.calculations.density
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">dairy_processing.calculations.density</span>
 </span></span></code></pre></div><p>or</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> dairy_processing.calculations <span style="color:#f92672">import</span> density
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">dairy_processing.calculations</span> <span class="kn">import</span> <span class="n">density</span>
 </span></span></code></pre></div><blockquote>
 <p>Note: We can also import specific functions as shown in the python modules section.</p>
 </blockquote>
@@ -84,53 +147,53 @@ Python Modules In python a module is simply a file with a .</description>
 <p>These last 2 steps are typically performed by pip when an end user runs pip install.</p>
 <h3 id="pyenv-and-poetry-to-the-rescue">Pyenv and Poetry to the rescue</h3>
 <p>Poetry is a package which helps manage python packaging and dependency management. Pyenv allows you to manage multiple python versions on your computer. Installation of these tools is out of the scope of this guide.</p>
-<p>First we want to ensure our package is using the correct python version, this can be done by running <code>pyenv local 3.10.5</code> from within the root directory (note: multiple versions can be selected using <code>pyenv local 3.8.13 3.9.13 3.10.5</code> which would be required to run tox locally). Next we want to init a poetry project, which can be done using <code>poetry init</code>. Don&rsquo;t worry about specifiying dependencies interactively as these can be added easily later,  it&rsquo;s important that the name is same as the name of the root package.</p>
+<p>First we want to ensure our package is using the correct python version, this can be done by running <code>pyenv local 3.10.5</code> from within the root directory (note: multiple versions can be selected using <code>pyenv local 3.8.13 3.9.13 3.10.5</code> which would be required to run tox locally). Next we want to init a poetry project, which can be done using <code>poetry init</code>. Don&rsquo;t worry about specifiying dependencies interactively as these can be added easily later, it&rsquo;s important that the name is same as the name of the root package.</p>
 <p>If you check the <code>pyproject.toml</code> file you should have something similar to below.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">tool</span>.<span style="color:#a6e22e">poetry</span>]
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">name</span> = <span style="color:#e6db74">&#34;rootpackage&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">version</span> = <span style="color:#e6db74">&#34;0.0.0&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">description</span> = <span style="color:#e6db74">&#34;test package&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">authors</span> = [<span style="color:#e6db74">&#34;Your Name (your.name@email.com)&#34;</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">tool</span>.<span style="color:#a6e22e">poetry</span>.<span style="color:#a6e22e">dependencies</span>]
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">python</span> = <span style="color:#e6db74">&#34;^3.10&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">tool</span>.<span style="color:#a6e22e">poetry</span>.<span style="color:#a6e22e">dev-dependencies</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">build-system</span>]
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">requires</span> = [<span style="color:#e6db74">&#34;poetry-core&gt;=1.0.0&#34;</span>]
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">build-backend</span> = <span style="color:#e6db74">&#34;poetry.core.masonry.api&#34;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">poetry</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;rootpackage&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">version</span> <span class="p">=</span> <span class="s2">&#34;0.0.0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">description</span> <span class="p">=</span> <span class="s2">&#34;test package&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">authors</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;Your Name (your.name@email.com)&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">poetry</span><span class="p">.</span><span class="nx">dependencies</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">python</span> <span class="p">=</span> <span class="s2">&#34;^3.10&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">poetry</span><span class="p">.</span><span class="nx">dev-dependencies</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">build-system</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">requires</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;poetry-core&gt;=1.0.0&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">build-backend</span> <span class="p">=</span> <span class="s2">&#34;poetry.core.masonry.api&#34;</span>
 </span></span></code></pre></div><p>You need to ensure that your existing package is in a subfolder <code>./rootpackage</code> or <code>./src/rootpackage</code> and that there is a <code>__init__.py</code> file present. If your package needs dependencies, these can be added with <code>poetry add {depa} {depb}</code>, development dependencies can be added using the -D flag <code>poetry add -D pytest</code>.</p>
 <p>You can install the package and dependencies locally using <code>poetry install</code>, you can build the package using <code>poetry build</code> and you can publish the package using <code>poetry publish</code>.</p>
 <h3 id="library-inconsistency">Library inconsistency..</h3>
 <p>In theory we can use <code>pyproject.toml</code> to define all our project metadata and configuration for different tooling, however reality is a little more complicated. Some tools fully support <code>pyproject.toml</code>, some have partial support and some don&rsquo;t support it at all. In practice this means you may have some files like <code>tox.ini</code> and <code>setup.cfg</code> to contain certain configurations.</p>
 <h4 id="flake8">flake8</h4>
 <p>Flake8 is one the current python packages which chooses to ignore the <code>pyproject.toml</code> file, meaning that the easiest way to setup the configuration is to add code snippet to one of either <code>setup.cfg</code>, <code>tox.ini</code> or <code>.flake8</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[flake8]</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">max-line-length</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">88</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">extend-ignore</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">E203</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">per-file-ignores</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">__init__.py:F401</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[flake8]</span>
+</span></span><span class="line"><span class="cl"><span class="na">max-line-length</span> <span class="o">=</span> <span class="s">88</span>
+</span></span><span class="line"><span class="cl"><span class="na">extend-ignore</span> <span class="o">=</span> <span class="s">E203</span>
+</span></span><span class="line"><span class="cl"><span class="na">per-file-ignores</span> <span class="o">=</span> <span class="s">__init__.py:F401</span>
 </span></span></code></pre></div><h4 id="pytest">pytest</h4>
 <p>pytest is a library which has implemented a bridge to the existing <code>.ini</code> configuration from version 6.0, in future they will fully utilize the rich TOML format and as such have reserved <code>[tool.pytest]</code> for this future use.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span><span style="color:#75715e"># pyproject.toml</span>
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">tool</span>.<span style="color:#a6e22e">pytest</span>.<span style="color:#a6e22e">ini_options</span>]
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">minversion</span> = <span style="color:#e6db74">&#34;6.0&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">addopts</span> = <span style="color:#e6db74">&#34;-ra -q&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">testpaths</span> = [
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;tests&#34;</span>,
-</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;integration&#34;</span>,
-</span></span><span style="display:flex;"><span>]
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="c"># pyproject.toml</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">pytest</span><span class="p">.</span><span class="nx">ini_options</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">minversion</span> <span class="p">=</span> <span class="s2">&#34;6.0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">addopts</span> <span class="p">=</span> <span class="s2">&#34;-ra -q&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">testpaths</span> <span class="p">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;tests&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;integration&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
 </span></span></code></pre></div><h4 id="tox">tox</h4>
 <p>Tox has partial support for <code>pyproject.toml</code> by offering to inline existing ini-style fomat under the <code>tool.tox.legacy_tox_ini</code> key as a multi-line string. An example of this is shown below.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">tool</span>.<span style="color:#a6e22e">tox</span>]
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">legacy_tox_ini</span> = <span style="color:#e6db74">&#34;&#34;&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[tox]
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">envlist = py27,py36
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">[testenv]
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">deps = pytest &gt;= 3.0.0, &lt;4
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">commands = pytest
-</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">tox</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">legacy_tox_ini</span> <span class="p">=</span> <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">[tox]
+</span></span></span><span class="line"><span class="cl"><span class="s2">envlist = py27,py36
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">[testenv]
+</span></span></span><span class="line"><span class="cl"><span class="s2">deps = pytest &gt;= 3.0.0, &lt;4
+</span></span></span><span class="line"><span class="cl"><span class="s2">commands = pytest
+</span></span></span><span class="line"><span class="cl"><span class="s2">&#34;&#34;&#34;</span>
 </span></span></code></pre></div><p>Typically it is easier to avoid this and use the <code>tox.ini</code>, tox are targetting full toml support with their new release.</p>
 <h3 id="summary">Summary</h3>
 <p>Python has moved away from setup.py and setup.cfg to the new pyproject.toml file, most tools support <code>pyproject.toml</code> in some form, however don&rsquo;t expect them all to be perfect, and there are some who just don&rsquo;t support it yet. It is now easier than ever to setup a new package, but there is a lot of conflicting documentation due to this migration.</p>
