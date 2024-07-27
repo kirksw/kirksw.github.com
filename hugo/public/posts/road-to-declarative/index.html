@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Road to Declarative Systems | MDS</title>
+<meta name="keywords" content="">
+<meta name="description" content="Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.
+Why declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.">
+<meta name="author" content="Kirk Sweeney">
+<link rel="canonical" href="http://localhost:1313/posts/road-to-declarative/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.605ed0f4f9e8691805e7b25947b604a7eeb1483affac31e744a15a935e49ec21.css" integrity="sha256-YF7Q9PnoaRgF57JZR7YEp&#43;6xSDr/rDHnRKFak15J7CE=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/road-to-declarative/">
+
+<meta name="twitter:title" content="Road to Declarative Systems | MDS" />
+<meta name="twitter:description" content="Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.
+Why declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team." />
+<meta name="twitter:site" content="@novoreorx" />
+<meta name="twitter:creator" content="@novoreorx" />
+<meta property="og:title" content="Road to Declarative Systems | MDS" />
+<meta property="og:description" content="Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.
+Why declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/posts/road-to-declarative/" />
+<meta property="article:section" content="posts" />
+  <meta property="article:published_time" content="2024-07-27T12:50:29&#43;02:00" />
+  <meta property="article:modified_time" content="2024-07-27T12:50:29&#43;02:00" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Road to Declarative Systems",
+      "item": "http://localhost:1313/posts/road-to-declarative/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Road to Declarative Systems | MDS",
+  "name": "Road to Declarative Systems",
+  "description": "Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.\nWhy declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.",
+  "keywords": [
+    
+  ],
+  "wordCount" : "1022",
+  "inLanguage": "en",
+  "datePublished": "2024-07-27T12:50:29+02:00",
+  "dateModified": "2024-07-27T12:50:29+02:00",
+  "author":[{
+    "@type": "Person",
+    "name": "Kirk Sweeney"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/road-to-declarative/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "MDS",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary-bg: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+</head>
+
+<body class="" id="top"><script data-no-instant>
+function switchTheme(theme) {
+  switch (theme) {
+    case 'light':
+      document.body.classList.remove('dark');
+      break;
+    case 'dark':
+      document.body.classList.add('dark');
+      break;
+    
+    default:
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+      }
+  }
+}
+
+function isDarkTheme() {
+  return document.body.className.includes("dark");
+}
+
+function getPrefTheme() {
+  return localStorage.getItem("pref-theme");
+}
+
+function setPrefTheme(theme) {
+  switchTheme(theme)
+  localStorage.setItem("pref-theme", theme);
+}
+
+const toggleThemeCallbacks = {}
+toggleThemeCallbacks['main'] = (isDark) => {
+  
+  if (isDark) {
+    setPrefTheme('light');
+  } else {
+    setPrefTheme('dark');
+  }
+}
+
+
+
+
+window.addEventListener('toggle-theme', function() {
+  
+  const isDark = isDarkTheme()
+  for (const key in toggleThemeCallbacks) {
+    toggleThemeCallbacks[key](isDark)
+  }
+});
+
+
+function toggleThemeListener() {
+  
+  window.dispatchEvent(new CustomEvent('toggle-theme'));
+}
+
+</script>
+<script>
+  
+  (function() {
+    const defaultTheme = 'light';
+    const prefTheme = getPrefTheme();
+    const theme = prefTheme ? prefTheme : defaultTheme;
+
+    switchTheme(theme);
+  })();
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="MDS (Alt + H)">
+                <img src="http://localhost:1313/logo.png" alt="logo" aria-label="logo"
+                    height="30">MDS</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/posts/" title="Posts"
+                >Posts
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags"
+                >Tags
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/archives/" title="Archive"
+                >Archive
+                </a>
+            </li>
+            <li>
+                <a href="http://localhost:1313/search/" title="Search (Alt &#43; /)"data-no-instant accesskey=/
+                >Search
+                </a>
+            </li>
+            <li>
+                <a href="https://github.com/kirksw/" title="@Author" target="_blank"
+                >@Author<span class="external-link"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-external-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M11 7h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5" />
+  <line x1="10" y1="14" x2="20" y2="4" />
+  <polyline points="15 4 20 4 20 9" />
+</svg>
+</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main post">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Road to Declarative Systems
+    </h1>
+    <div class="post-meta"><span class="meta-item">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar" style="user-select: text;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" style="user-select: text;"></rect><line x1="16" y1="2" x2="16" y2="6" style="user-select: text;"></line><line x1="8" y1="2" x2="8" y2="6" style="user-select: text;"></line><line x1="3" y1="10" x2="21" y2="10" style="user-select: text;"></line></svg>
+  <span>2024-07-27</span></span>
+
+      
+      
+    </div>
+  </header> 
+  <div class="post-content"><p>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.</p>
+<h2 id="why-declarative-systems">Why declarative systems?<a hidden class="anchor" aria-hidden="true" href="#why-declarative-systems">¶</a></h2>
+<p>Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.</p>
+<p>Perhaps you would start by documenting the current state of things, probably by polling this data from an api, then you would need to figure out what needs to be changed, and then finally how to change the state of things to match the new standards.</p>
+<p>However imagine if the state of these buckets was defined declaratively as code, you then could easily see the state as defined in the code, and then make changes to the code to match the new standards.</p>
+<p>Tooling like terraform, kubernetes, an nix are all examples of industry leading tooling that allow you to define the state of things in code.</p>
+<h2 id="introduction-to-terraform">Introduction to terraform<a hidden class="anchor" aria-hidden="true" href="#introduction-to-terraform">¶</a></h2>
+<p>The big aha moment for me was when I started using terraform to manage Azure cloud infrastructure. Terraform uses a language called HCL (HashiCorp Configuration Language) to define the state, a simple example of this is shown below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="s2">&#34;resource&#34; &#34;azurerm_resource_group&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>     <span class="o">=</span> <span class="s2">&#34;example-resources&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  location</span> <span class="o">=</span> <span class="s2">&#34;West Europe&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;resource&#34; &#34;azurerm_storage_account&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>                     <span class="o">=</span> <span class="s2">&#34;examplestorageaccount&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  resource_group_name</span>      <span class="o">=</span> <span class="k">azurerm_resource_group</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">name</span>
+</span></span><span class="line"><span class="cl"><span class="n">  location</span>                 <span class="o">=</span> <span class="k">azurerm_resource_group</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">location</span>
+</span></span><span class="line"><span class="cl"><span class="n">  account_tier</span>             <span class="o">=</span> <span class="s2">&#34;Standard&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  account_replication_type</span> <span class="o">=</span> <span class="s2">&#34;LRS&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p>You can then run <code>terraform plan</code> to see what changes will be made to the state, and then <code>terraform apply</code> to make the changes if you are happy with the plan. No where in this code do we define how to make the changes, terraform figures this out for us, all thanks to the plethora of providers that are available.</p>
+<p>Now with infrastructure to check the state I can grep the codebase, and making a change is a simple as a pull request. Of course there are some challenges, as drift can occur due to external changes, but these can be mitigated with good practices.</p>
+<h2 id="down-the-nix-rabbit-hole">Down the nix rabbit hole<a hidden class="anchor" aria-hidden="true" href="#down-the-nix-rabbit-hole">¶</a></h2>
+<p>I have done a lot of distro hopping over the years, and could never really find one that allowed me to have the level of control I wanted over my system - letting me use bleeding edge software, but also ensuring that everything was stable. My arch system would always break due to some update to nvidia drivers, and my ubuntu system would always be out of date.</p>
+<p>Additionally to ensure that my development environment was consistent I made a dotfiles repo, which I would use to install all the software I needed on a new system. However this was always a pain as I used mac/wsl for work, and linux for personal use and had to make this work for all the systems.</p>
+<p>A then colleague of mine introduced me to nix, and I was blown away by the power of the system and was surprised it wasn&rsquo;t more popular. Nix uses a functional programming language to define the state of the system, and then uses the nix package manager to ensure that the system is in the desired state - this should be starting to sound familiar.</p>
+<p>I&rsquo;m not going to lie - it was a steep learning curve and the ecosystem is quite fragmented. There are nix flakes which introduces dependency locking, however it is still considered experimental even though most people are using them. Also there are partnering modules such as darwin-nix which manages mac clients and home-manage which manages setting up home environments (ala dotfiles). You also need to choose a release channel or choose unstable, I typically use the latest stable release but use overlays to get the latest software where required.</p>
+<p>Nix has finally enabled me to have a consistent and declarative development environment across all my systems (controlling software and configurations), and I can now easily install software on a new system by running a couple of commands. Day one is now a breeze I am up and running in minutes.</p>
+<h2 id="kubernetes">Kubernetes<a hidden class="anchor" aria-hidden="true" href="#kubernetes">¶</a></h2>
+<p>Kubernetes is another example of a system which allows you to define the state of the system in code. You define the desired state in a yaml file called a manifest and then apply this to the cluster. Kubernetes will then figure out how to make the changes to the cluster to match the desired state. This like terraform allows you easily inspect the diff and know what changes will be made.</p>
+<p>I won&rsquo;t lie, kubernetes is a beast and there is a lot to learn, but the power of the system is undeniable. There are tools like helm and kustomize which allow templating/overlay type functionality the yaml manifests (which terraform and nix have built in because they are programming languages). Also there are tools like argo-cd which allow you to manage the state of the cluster in a gitops manner, meaning that it will constantly poll the git repo and ensure that the cluster is in the desired state (something that needs to be handled manually with terraform).</p>
+<h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">¶</a></h2>
+<p>I hope this post has given you some insight into the power of declaratively defining systems, and how they can be used to manage the state of things in a straightforward manner. I have only scratched the surface of the tools available, and I am excited to see what the future holds for this space.</p>
+<p>As with anything there is a trade-off in that more work needs to be put in upfront. Much like writing tests or cicd pipelines, the benefits are not immediately apparent, but over time the investment will pay off and you will be thanking yourself if you ever need to rebuild the system from scratch.</p>
+<p>Please let me know if you would like me to expand on any of the topics mentioned in this post.</p>
+<h2 id="references">References<a hidden class="anchor" aria-hidden="true" href="#references">¶</a></h2>
+<h3 id="terraform">Terraform<a hidden class="anchor" aria-hidden="true" href="#terraform">¶</a></h3>
+<p><a href="https://www.terraform.io/">terraform</a>
+<a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs">azure provider</a>
+<a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs">aws provider</a>
+<a href="https://registry.terraform.io/providers/hashicorp/google/latest/docs">gcp provider</a></p>
+<h3 id="nix">Nix<a hidden class="anchor" aria-hidden="true" href="#nix">¶</a></h3>
+<p><a href="https://github.com/kirksw/nixfiles-v2">my nix config</a>
+<a href="https://nixos.org/">nixos</a>
+<a href="https://nixos.wiki/wiki/Flakes">nix flakes</a>
+<a href="https://github.com/LnL7/nix-darwin">nix-darwin</a>
+<a href="https://nix-community.github.io/home-manager/">home-manager</a></p>
+<h3 id="kubernetes-1">Kubernetes<a hidden class="anchor" aria-hidden="true" href="#kubernetes-1">¶</a></h3>
+<p><a href="https://kubernetes.io/">kubernetes</a>
+<a href="https://helm.sh/">helm</a>
+<a href="https://kustomize.io/">kustomize</a>
+<a href="https://argoproj.github.io/argo-cd/">argo-cd</a></p>
+
+
+  </div>
+
+  <footer class="post-footer">
+  </footer><div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "kswe" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+
+    </main>
+    
+<footer class="footer">
+  <span>&copy; 2024 <a href="http://localhost:1313/">MDS</a></span><span style="display: inline-block; margin-left: 1em;">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA</a>
+  </span>
+  <span style="display: inline-block; margin-left: 1em;">
+    Powered by
+    <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+    <a href="https://github.com/reorx/hugo-PaperModX/" rel="noopener" target="_blank">PaperModX</a>
+  </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+    <path d="M12 6H0l6-6z" />
+  </svg>
+</a>
+
+<script>
+  (function() {
+     
+    const disableThemeToggle = '' == '1';
+    if (disableThemeToggle) {
+      return;
+    }
+
+    let button = document.getElementById("theme-toggle")
+    
+    button.removeEventListener('click', toggleThemeListener)
+    
+    button.addEventListener('click', toggleThemeListener)
+  })();
+</script>
+
+<script>
+  (function () {
+    let menu = document.getElementById('menu')
+    if (menu) {
+      menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+      menu.onscroll = function () {
+        localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+      }
+    }
+
+    const disableSmoothScroll = '' == '1';
+    const enableInstantClick = '' == '1';
+    
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || disableSmoothScroll || enableInstantClick) {
+      return;
+    }
+    
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        var id = this.getAttribute("href").substr(1);
+        document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+          behavior: "smooth"
+        });
+        if (id === "top") {
+          history.replaceState(null, null, " ");
+        } else {
+          history.pushState(null, null, `#${id}`);
+        }
+      });
+    });
+  })();
+</script>
+<script>
+  var mybutton = document.getElementById("top-link");
+  window.onscroll = function () {
+    if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+      mybutton.style.visibility = "visible";
+      mybutton.style.opacity = "1";
+    } else {
+      mybutton.style.visibility = "hidden";
+      mybutton.style.opacity = "0";
+    }
+  };
+</script>
+<script>
+  if (window.scrollListeners) {
+    
+    for (const listener of scrollListeners) {
+      window.removeEventListener('scroll', listener)
+    }
+  }
+  window.scrollListeners = []
+</script>
+
+
+
+<script src="/js/medium-zoom.min.js" data-no-instant
+></script>
+
+
+
+
+<script>
+  
+  
+  (function() {
+    const enableTocScroll = '' == '1'
+    if (!enableTocScroll) {
+      return
+    }
+    if (!document.querySelector('.toc')) {
+      console.log('no toc found, ignore toc scroll')
+      return
+    }
+    
+
+    
+    const scrollListeners = window.scrollListeners
+    const headings = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id]');
+    const activeClass = 'active';
+
+    
+    let activeHeading = headings[0];
+    getLinkByHeading(activeHeading).classList.add(activeClass);
+
+    const onScroll = () => {
+      const passedHeadings = [];
+      for (const h of headings) {
+        
+        if (getOffsetTop(h) < 5) {
+          passedHeadings.push(h)
+        } else {
+          break;
+        }
+      }
+      if (passedHeadings.length > 0) {
+        newActiveHeading = passedHeadings[passedHeadings.length - 1];
+      } else {
+        newActiveHeading = headings[0];
+      }
+      if (activeHeading != newActiveHeading) {
+        getLinkByHeading(activeHeading).classList.remove(activeClass);
+        activeHeading = newActiveHeading;
+        getLinkByHeading(activeHeading).classList.add(activeClass);
+      }
+    }
+
+    let timer = null;
+    const scrollListener = () => {
+      if (timer !== null) {
+        clearTimeout(timer)
+      }
+      timer = setTimeout(onScroll, 50)
+    }
+    window.addEventListener('scroll', scrollListener, false);
+    scrollListeners.push(scrollListener)
+
+    function getLinkByHeading(heading) {
+      const id = encodeURI(heading.getAttribute('id')).toLowerCase();
+      return document.querySelector(`.toc ul li a[href="#${id}"]`);
+    }
+
+    function getOffsetTop(heading) {
+      if (!heading.getClientRects().length) {
+        return 0;
+      }
+      let rect = heading.getBoundingClientRect();
+      return rect.top
+    }
+  })();
+  </script>
+
+</body>
+
+</html>

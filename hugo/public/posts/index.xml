@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Posts on MDS</title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on MDS</description>
+    <image>
+      <url>http://localhost:1313/logo.png</url>
+      <link>http://localhost:1313/logo.png</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 27 Jul 2024 12:50:29 +0200</lastBuildDate><atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Road to Declarative Systems</title>
+      <link>http://localhost:1313/posts/road-to-declarative/</link>
+      <pubDate>Sat, 27 Jul 2024 12:50:29 +0200</pubDate>
+      
+      <guid>http://localhost:1313/posts/road-to-declarative/</guid>
+      <description>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.
+Why declarative systems? Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.</description>
+      <content:encoded><![CDATA[<p>Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.</p>
+<h2 id="why-declarative-systems">Why declarative systems?</h2>
+<p>Lets say you were tasked with ensuring that all cloud storage is configured in a manner which matches the new standards put in place by the security team.</p>
+<p>Perhaps you would start by documenting the current state of things, probably by polling this data from an api, then you would need to figure out what needs to be changed, and then finally how to change the state of things to match the new standards.</p>
+<p>However imagine if the state of these buckets was defined declaratively as code, you then could easily see the state as defined in the code, and then make changes to the code to match the new standards.</p>
+<p>Tooling like terraform, kubernetes, an nix are all examples of industry leading tooling that allow you to define the state of things in code.</p>
+<h2 id="introduction-to-terraform">Introduction to terraform</h2>
+<p>The big aha moment for me was when I started using terraform to manage Azure cloud infrastructure. Terraform uses a language called HCL (HashiCorp Configuration Language) to define the state, a simple example of this is shown below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-hcl" data-lang="hcl"><span class="line"><span class="cl"><span class="s2">&#34;resource&#34; &#34;azurerm_resource_group&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>     <span class="o">=</span> <span class="s2">&#34;example-resources&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  location</span> <span class="o">=</span> <span class="s2">&#34;West Europe&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="s2">&#34;resource&#34; &#34;azurerm_storage_account&#34; &#34;example&#34;</span> {
+</span></span><span class="line"><span class="cl"><span class="n">  name</span>                     <span class="o">=</span> <span class="s2">&#34;examplestorageaccount&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  resource_group_name</span>      <span class="o">=</span> <span class="k">azurerm_resource_group</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">name</span>
+</span></span><span class="line"><span class="cl"><span class="n">  location</span>                 <span class="o">=</span> <span class="k">azurerm_resource_group</span><span class="p">.</span><span class="k">example</span><span class="p">.</span><span class="k">location</span>
+</span></span><span class="line"><span class="cl"><span class="n">  account_tier</span>             <span class="o">=</span> <span class="s2">&#34;Standard&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">  account_replication_type</span> <span class="o">=</span> <span class="s2">&#34;LRS&#34;</span>
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></div><p>You can then run <code>terraform plan</code> to see what changes will be made to the state, and then <code>terraform apply</code> to make the changes if you are happy with the plan. No where in this code do we define how to make the changes, terraform figures this out for us, all thanks to the plethora of providers that are available.</p>
+<p>Now with infrastructure to check the state I can grep the codebase, and making a change is a simple as a pull request. Of course there are some challenges, as drift can occur due to external changes, but these can be mitigated with good practices.</p>
+<h2 id="down-the-nix-rabbit-hole">Down the nix rabbit hole</h2>
+<p>I have done a lot of distro hopping over the years, and could never really find one that allowed me to have the level of control I wanted over my system - letting me use bleeding edge software, but also ensuring that everything was stable. My arch system would always break due to some update to nvidia drivers, and my ubuntu system would always be out of date.</p>
+<p>Additionally to ensure that my development environment was consistent I made a dotfiles repo, which I would use to install all the software I needed on a new system. However this was always a pain as I used mac/wsl for work, and linux for personal use and had to make this work for all the systems.</p>
+<p>A then colleague of mine introduced me to nix, and I was blown away by the power of the system and was surprised it wasn&rsquo;t more popular. Nix uses a functional programming language to define the state of the system, and then uses the nix package manager to ensure that the system is in the desired state - this should be starting to sound familiar.</p>
+<p>I&rsquo;m not going to lie - it was a steep learning curve and the ecosystem is quite fragmented. There are nix flakes which introduces dependency locking, however it is still considered experimental even though most people are using them. Also there are partnering modules such as darwin-nix which manages mac clients and home-manage which manages setting up home environments (ala dotfiles). You also need to choose a release channel or choose unstable, I typically use the latest stable release but use overlays to get the latest software where required.</p>
+<p>Nix has finally enabled me to have a consistent and declarative development environment across all my systems (controlling software and configurations), and I can now easily install software on a new system by running a couple of commands. Day one is now a breeze I am up and running in minutes.</p>
+<h2 id="kubernetes">Kubernetes</h2>
+<p>Kubernetes is another example of a system which allows you to define the state of the system in code. You define the desired state in a yaml file called a manifest and then apply this to the cluster. Kubernetes will then figure out how to make the changes to the cluster to match the desired state. This like terraform allows you easily inspect the diff and know what changes will be made.</p>
+<p>I won&rsquo;t lie, kubernetes is a beast and there is a lot to learn, but the power of the system is undeniable. There are tools like helm and kustomize which allow templating/overlay type functionality the yaml manifests (which terraform and nix have built in because they are programming languages). Also there are tools like argo-cd which allow you to manage the state of the cluster in a gitops manner, meaning that it will constantly poll the git repo and ensure that the cluster is in the desired state (something that needs to be handled manually with terraform).</p>
+<h2 id="summary">Summary</h2>
+<p>I hope this post has given you some insight into the power of declaratively defining systems, and how they can be used to manage the state of things in a straightforward manner. I have only scratched the surface of the tools available, and I am excited to see what the future holds for this space.</p>
+<p>As with anything there is a trade-off in that more work needs to be put in upfront. Much like writing tests or cicd pipelines, the benefits are not immediately apparent, but over time the investment will pay off and you will be thanking yourself if you ever need to rebuild the system from scratch.</p>
+<p>Please let me know if you would like me to expand on any of the topics mentioned in this post.</p>
+<h2 id="references">References</h2>
+<h3 id="terraform">Terraform</h3>
+<p><a href="https://www.terraform.io/">terraform</a>
+<a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs">azure provider</a>
+<a href="https://registry.terraform.io/providers/hashicorp/aws/latest/docs">aws provider</a>
+<a href="https://registry.terraform.io/providers/hashicorp/google/latest/docs">gcp provider</a></p>
+<h3 id="nix">Nix</h3>
+<p><a href="https://github.com/kirksw/nixfiles-v2">my nix config</a>
+<a href="https://nixos.org/">nixos</a>
+<a href="https://nixos.wiki/wiki/Flakes">nix flakes</a>
+<a href="https://github.com/LnL7/nix-darwin">nix-darwin</a>
+<a href="https://nix-community.github.io/home-manager/">home-manager</a></p>
+<h3 id="kubernetes-1">Kubernetes</h3>
+<p><a href="https://kubernetes.io/">kubernetes</a>
+<a href="https://helm.sh/">helm</a>
+<a href="https://kustomize.io/">kustomize</a>
+<a href="https://argoproj.github.io/argo-cd/">argo-cd</a></p>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>

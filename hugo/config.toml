@@ -22,61 +22,73 @@ imageUrl = "logo.png"
 imageHeight = 200
 imageWidth = 200
 
-    [[params.profileMode.socialIcons]]
-    name = "linkedin-simple"
-    url = "https://www.linkedin.com/in/kirk-sweeney/"
+[[params.profileMode.socialIcons]]
+name = "linkedin-simple"
+url = "https://www.linkedin.com/in/kirk-sweeney/"
 
-    [[params.profileMode.socialIcons]]
-    name = "github-simple"
-    url = "https://github.com/kirksw"
+[[params.profileMode.socialIcons]]
+name = "github-simple"
+url = "https://github.com/kirksw"
 
-    [[params.profileMode.socialIcons]]
-    name = "buymeacoffee"
-    url = "https://www.buymeacoffee.com/kswe"
+[[params.profileMode.socialIcons]]
+name = "buymeacoffee"
+url = "https://www.buymeacoffee.com/kswe"
 
-    [[params.profileMode.socialIcons]]
-    name = "stackoverflow"
-    url = "https://stackoverflow.com/users/7362737/kirk"
+[[params.profileMode.socialIcons]]
+name = "stackoverflow"
+url = "https://stackoverflow.com/users/7362737/kirk"
 
-    [[params.profileMode.buttons]]
-    name = "Posts"
-    url = "posts"
+[[params.profileMode.buttons]]
+name = "Posts"
+url = "posts"
 
-    [[params.profileMode.buttons]]
-    name = "Tags"
-    url = "tags"
-
+[[params.profileMode.buttons]]
+name = "Tags"
+url = "tags"
 
 [languages.en]
 languageName = "English"
 weight = 1
 
-    [[languages.en.menu.main]]
-    name = "Posts"
-    url = "/posts/"
-    weight = 1
+[[languages.en.menu.main]]
+name = "Posts"
+url = "/posts/"
+weight = 1
 
-    [[languages.en.menu.main]]
-    name = "Tags"
-    url = "/tags/"
-    weight = 4
+[[languages.en.menu.main]]
+name = "Tags"
+url = "/tags/"
+weight = 4
 
-    [[languages.en.menu.main]]
-    name = "Archive"
-    url = "/archives/"
-    weight = 5
+[[languages.en.menu.main]]
+name = "Archive"
+url = "/archives/"
+weight = 5
 
-    [[languages.en.menu.main]]
-    name = "Search"
-    url = "/search/"
-    weight = 10
+[[languages.en.menu.main]]
+name = "Search"
+url = "/search/"
+weight = 10
 
-    [[languages.en.menu.main]]
-    name = "@Author"
-    url = "https://github.com/kirksw"
+[[languages.en.menu.main]]
+name = "@Author"
+url = "https://github.com/kirksw"
 
-    [languages.en.menu.main.params]
-    external = true
+[languages.en.menu.main.params]
+external = true
 
 [outputs]
 home = ["HTML", "RSS", "JSON"]
+
+[markup.goldmark]
+duplicateResourceFiles = false
+extensions.strikethrough = true
+table = true
+parser.attribute.block = true
+renderer.unsafe = true
+
+[markup.highlight]
+style = "monokai"
+guessSyntax = true
+lineNos = false
+noClasses = false

@@ -1,5 +1,5 @@
 ---
-title: "Python Packages in 2022"
+title: "Python Packaging with Poetry"
 date: 2022-09-11T10:14:31+02:00
 draft: false
 ---
@@ -17,7 +17,7 @@ def hello_name(name):
     print(f"hello {name}")
 ```
 
-To have this function store in a welcome module, we just need to save this code in a file named `welcome.py`. 
+To have this function store in a welcome module, we just need to save this code in a file named `welcome.py`.
 
 This module can be used in one of two ways, either by importing the entire module, or importing a specific function. Never use `from module import *` as then you have no transparency on where certain functions/classes were imported from.
 
@@ -34,11 +34,13 @@ hello_name("tim") # prints "hello tim"
 ```
 
 Module introduce several benefits:
+
 - Improved development
 - Code re-uses
 - Separate namespaces
 
 Finally a note on how python finds these modules. When `import welcome` is evaluated, the interpreter will search three locations.
+
 - The directory containing the input script (or current directly when no file is specified)
 - PYTHONPATH (a list of directories with the same syntax as PATH)
 - The installation-dependant default (by convention including a site-packages directory handled by the site module).
@@ -89,7 +91,7 @@ These last 2 steps are typically performed by pip when an end user runs pip inst
 
 Poetry is a package which helps manage python packaging and dependency management. Pyenv allows you to manage multiple python versions on your computer. Installation of these tools is out of the scope of this guide.
 
-First we want to ensure our package is using the correct python version, this can be done by running `pyenv local 3.10.5` from within the root directory (note: multiple versions can be selected using `pyenv local 3.8.13 3.9.13 3.10.5` which would be required to run tox locally). Next we want to init a poetry project, which can be done using `poetry init`. Don't worry about specifiying dependencies interactively as these can be added easily later,  it's important that the name is same as the name of the root package.
+First we want to ensure our package is using the correct python version, this can be done by running `pyenv local 3.10.5` from within the root directory (note: multiple versions can be selected using `pyenv local 3.8.13 3.9.13 3.10.5` which would be required to run tox locally). Next we want to init a poetry project, which can be done using `poetry init`. Don't worry about specifiying dependencies interactively as these can be added easily later, it's important that the name is same as the name of the root package.
 
 If you check the `pyproject.toml` file you should have something similar to below.
 
@@ -110,14 +112,13 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 ```
 
-You need to ensure that your existing package is in a subfolder `./rootpackage` or `./src/rootpackage` and that there is a `__init__.py` file present. If your package needs dependencies, these can be added with `poetry add {depa} {depb}`, development dependencies can be added using the -D flag `poetry add -D pytest`. 
+You need to ensure that your existing package is in a subfolder `./rootpackage` or `./src/rootpackage` and that there is a `__init__.py` file present. If your package needs dependencies, these can be added with `poetry add {depa} {depb}`, development dependencies can be added using the -D flag `poetry add -D pytest`.
 
 You can install the package and dependencies locally using `poetry install`, you can build the package using `poetry build` and you can publish the package using `poetry publish`.
 
-### Library inconsistency.. 
+### Library inconsistency..
 
 In theory we can use `pyproject.toml` to define all our project metadata and configuration for different tooling, however reality is a little more complicated. Some tools fully support `pyproject.toml`, some have partial support and some don't support it at all. In practice this means you may have some files like `tox.ini` and `setup.cfg` to contain certain configurations.
-
 
 #### flake8
 
@@ -163,7 +164,6 @@ commands = pytest
 ```
 
 Typically it is easier to avoid this and use the `tox.ini`, tox are targetting full toml support with their new release.
-
 
 ### Summary
 
