@@ -2,6 +2,7 @@
 title: "Python Packaging with Poetry"
 date: 2022-09-11T10:14:31+02:00
 draft: false
+tags: ["python", "poetry"]
 ---
 
 It's not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of `setup.py`, `setup.cfg` and `pyproject.toml`. Before we look at these, it is important to first make sure we properly understand python modules and packages.

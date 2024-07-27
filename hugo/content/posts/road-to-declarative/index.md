@@ -2,6 +2,7 @@
 title: "Road to Declarative Systems"
 date: 2024-07-27T12:50:29+02:00
 draft: false
+tags: ["terraform", "nix", "kubernetes"]
 ---
 
 Over the past few years I have worked at different companies building data lakehouses/meshes, and one challenge that has been constant is the need to understand the state of things (cloud, platform, pipeline, computers, etc) and how to document and mutate the state of these in a straightforward manner.

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Poetry on MDS</title>
+    <link>http://localhost:1313/tags/poetry/</link>
+    <description>Recent content in Poetry on MDS</description>
+    <image>
+      <url>http://localhost:1313/logo.png</url>
+      <link>http://localhost:1313/logo.png</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 11 Sep 2022 10:14:31 +0200</lastBuildDate><atom:link href="http://localhost:1313/tags/poetry/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Python Packaging with Poetry</title>
+      <link>http://localhost:1313/posts/python-packaging-part1/</link>
+      <pubDate>Sun, 11 Sep 2022 10:14:31 +0200</pubDate>
+      
+      <guid>http://localhost:1313/posts/python-packaging-part1/</guid>
+      <description>It&amp;rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of setup.py, setup.cfg and pyproject.toml. Before we look at these, it is important to first make sure we properly understand python modules and packages.
+Python Modules In python a module is simply a file with a .</description>
+      <content:encoded><![CDATA[<p>It&rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of <code>setup.py</code>, <code>setup.cfg</code> and <code>pyproject.toml</code>. Before we look at these, it is important to first make sure we properly understand python modules and packages.</p>
+<h3 id="python-modules">Python Modules</h3>
+<p>In python a module is simply a file with a <code>.py</code> extension which contains related code, which could be functions, classes, variables or etc.</p>
+<p>For example lets define a function to greet a user:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">hello_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;hello </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>To have this function store in a welcome module, we just need to save this code in a file named <code>welcome.py</code>.</p>
+<p>This module can be used in one of two ways, either by importing the entire module, or importing a specific function. Never use <code>from module import *</code> as then you have no transparency on where certain functions/classes were imported from.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">welcome</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">welcome</span><span class="o">.</span><span class="n">hello_name</span><span class="p">(</span><span class="s2">&#34;bob&#34;</span><span class="p">)</span> <span class="c1"># prints &#34;hello bob&#34;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">welcome</span> <span class="kn">import</span> <span class="n">hello_name</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">hello_name</span><span class="p">(</span><span class="s2">&#34;tim&#34;</span><span class="p">)</span> <span class="c1"># prints &#34;hello tim&#34;</span>
+</span></span></code></pre></div><p>Module introduce several benefits:</p>
+<ul>
+<li>Improved development</li>
+<li>Code re-uses</li>
+<li>Separate namespaces</li>
+</ul>
+<p>Finally a note on how python finds these modules. When <code>import welcome</code> is evaluated, the interpreter will search three locations.</p>
+<ul>
+<li>The directory containing the input script (or current directly when no file is specified)</li>
+<li>PYTHONPATH (a list of directories with the same syntax as PATH)</li>
+<li>The installation-dependant default (by convention including a site-packages directory handled by the site module).</li>
+</ul>
+<h3 id="python-packages">Python Packages</h3>
+<p>Python collection of modules intended to be installed and used together. When developing a large application you will probably end up with multiple modules which need to be organized, this is what a package does.</p>
+<p>In python a package (or subpackage) is a folder containing one or more modules and a <code>__init__.py</code> file, which can be empty or contain some initialization code for the package.</p>
+<p><img loading="lazy" src="/posts/python-packaging-part1/images/dairy_processing_package.png" type="" alt="python package hierachy"  /></p>
+<p>We can import certain modules from any of these packages using dot notation. For example to import module_1 from the above package, we could use either of the following code snippets</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">dairy_processing.calculations.density</span>
+</span></span></code></pre></div><p>or</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">dairy_processing.calculations</span> <span class="kn">import</span> <span class="n">density</span>
+</span></span></code></pre></div><blockquote>
+<p>Note: We can also import specific functions as shown in the python modules section.</p>
+</blockquote>
+<h3 id="packaging-flow">Packaging flow</h3>
+<p>Publishing a package requires a flow from the author’s source code to an end user’s Python environment. The steps to achieve this are:</p>
+<ul>
+<li>
+<p>Have a source tree containing the package. This is typically a checkout from a version control system (VCS).</p>
+</li>
+<li>
+<p>Prepare a configuration file describing the package metadata (name, version and so forth) and how to create the build artifacts. For most packages, this will be a pyproject.toml file, maintained manually in the source tree.</p>
+</li>
+<li>
+<p>Create build artifacts to be sent to the package distribution service (usually PyPI); these will normally be a source distribution (“sdist”) and one or more built distributions (“wheels”). These are made by a build tool using the configuration file from the previous step. Often there is just one generic wheel for a pure Python package.</p>
+</li>
+<li>
+<p>Upload the build artifacts to the package distribution service.</p>
+</li>
+</ul>
+<p>At that point, the package is present on the package distribution service. To use the package, end users must:</p>
+<ul>
+<li>
+<p>Download one of the package’s build artifacts from the package distribution service.</p>
+</li>
+<li>
+<p>Install it in their Python environment, usually in its site-packages directory. This step may involve a build/compile step which, if needed, must be described by the package metadata.</p>
+</li>
+</ul>
+<p>These last 2 steps are typically performed by pip when an end user runs pip install.</p>
+<h3 id="pyenv-and-poetry-to-the-rescue">Pyenv and Poetry to the rescue</h3>
+<p>Poetry is a package which helps manage python packaging and dependency management. Pyenv allows you to manage multiple python versions on your computer. Installation of these tools is out of the scope of this guide.</p>
+<p>First we want to ensure our package is using the correct python version, this can be done by running <code>pyenv local 3.10.5</code> from within the root directory (note: multiple versions can be selected using <code>pyenv local 3.8.13 3.9.13 3.10.5</code> which would be required to run tox locally). Next we want to init a poetry project, which can be done using <code>poetry init</code>. Don&rsquo;t worry about specifiying dependencies interactively as these can be added easily later, it&rsquo;s important that the name is same as the name of the root package.</p>
+<p>If you check the <code>pyproject.toml</code> file you should have something similar to below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">poetry</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">name</span> <span class="p">=</span> <span class="s2">&#34;rootpackage&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">version</span> <span class="p">=</span> <span class="s2">&#34;0.0.0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">description</span> <span class="p">=</span> <span class="s2">&#34;test package&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">authors</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;Your Name (your.name@email.com)&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">poetry</span><span class="p">.</span><span class="nx">dependencies</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">python</span> <span class="p">=</span> <span class="s2">&#34;^3.10&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">poetry</span><span class="p">.</span><span class="nx">dev-dependencies</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">build-system</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">requires</span> <span class="p">=</span> <span class="p">[</span><span class="s2">&#34;poetry-core&gt;=1.0.0&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">build-backend</span> <span class="p">=</span> <span class="s2">&#34;poetry.core.masonry.api&#34;</span>
+</span></span></code></pre></div><p>You need to ensure that your existing package is in a subfolder <code>./rootpackage</code> or <code>./src/rootpackage</code> and that there is a <code>__init__.py</code> file present. If your package needs dependencies, these can be added with <code>poetry add {depa} {depb}</code>, development dependencies can be added using the -D flag <code>poetry add -D pytest</code>.</p>
+<p>You can install the package and dependencies locally using <code>poetry install</code>, you can build the package using <code>poetry build</code> and you can publish the package using <code>poetry publish</code>.</p>
+<h3 id="library-inconsistency">Library inconsistency..</h3>
+<p>In theory we can use <code>pyproject.toml</code> to define all our project metadata and configuration for different tooling, however reality is a little more complicated. Some tools fully support <code>pyproject.toml</code>, some have partial support and some don&rsquo;t support it at all. In practice this means you may have some files like <code>tox.ini</code> and <code>setup.cfg</code> to contain certain configurations.</p>
+<h4 id="flake8">flake8</h4>
+<p>Flake8 is one the current python packages which chooses to ignore the <code>pyproject.toml</code> file, meaning that the easiest way to setup the configuration is to add code snippet to one of either <code>setup.cfg</code>, <code>tox.ini</code> or <code>.flake8</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ini" data-lang="ini"><span class="line"><span class="cl"><span class="k">[flake8]</span>
+</span></span><span class="line"><span class="cl"><span class="na">max-line-length</span> <span class="o">=</span> <span class="s">88</span>
+</span></span><span class="line"><span class="cl"><span class="na">extend-ignore</span> <span class="o">=</span> <span class="s">E203</span>
+</span></span><span class="line"><span class="cl"><span class="na">per-file-ignores</span> <span class="o">=</span> <span class="s">__init__.py:F401</span>
+</span></span></code></pre></div><h4 id="pytest">pytest</h4>
+<p>pytest is a library which has implemented a bridge to the existing <code>.ini</code> configuration from version 6.0, in future they will fully utilize the rich TOML format and as such have reserved <code>[tool.pytest]</code> for this future use.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="c"># pyproject.toml</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">pytest</span><span class="p">.</span><span class="nx">ini_options</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">minversion</span> <span class="p">=</span> <span class="s2">&#34;6.0&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">addopts</span> <span class="p">=</span> <span class="s2">&#34;-ra -q&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">testpaths</span> <span class="p">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;tests&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;integration&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="p">]</span>
+</span></span></code></pre></div><h4 id="tox">tox</h4>
+<p>Tox has partial support for <code>pyproject.toml</code> by offering to inline existing ini-style fomat under the <code>tool.tox.legacy_tox_ini</code> key as a multi-line string. An example of this is shown below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-toml" data-lang="toml"><span class="line"><span class="cl"><span class="p">[</span><span class="nx">tool</span><span class="p">.</span><span class="nx">tox</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nx">legacy_tox_ini</span> <span class="p">=</span> <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">[tox]
+</span></span></span><span class="line"><span class="cl"><span class="s2">envlist = py27,py36
+</span></span></span><span class="line"><span class="cl"><span class="s2">
+</span></span></span><span class="line"><span class="cl"><span class="s2">[testenv]
+</span></span></span><span class="line"><span class="cl"><span class="s2">deps = pytest &gt;= 3.0.0, &lt;4
+</span></span></span><span class="line"><span class="cl"><span class="s2">commands = pytest
+</span></span></span><span class="line"><span class="cl"><span class="s2">&#34;&#34;&#34;</span>
+</span></span></code></pre></div><p>Typically it is easier to avoid this and use the <code>tox.ini</code>, tox are targetting full toml support with their new release.</p>
+<h3 id="summary">Summary</h3>
+<p>Python has moved away from setup.py and setup.cfg to the new pyproject.toml file, most tools support <code>pyproject.toml</code> in some form, however don&rsquo;t expect them all to be perfect, and there are some who just don&rsquo;t support it yet. It is now easier than ever to setup a new package, but there is a lot of conflicting documentation due to this migration.</p>
+<p>Poetry is a powerful tool to assist with managing packaging, and we didn&rsquo;t even scratch the surface here. In a future post I will walk through how this is actually setup and used in a DevOps pipeline along with all the common tooling (pypi, flake8, sphinx, coverage, pytest). There are also alternatives like hatch worth investigation, and also now more than ever, it is worth considering whether these tools are even required.</p>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
