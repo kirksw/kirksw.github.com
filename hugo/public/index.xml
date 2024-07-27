@@ -75,11 +75,11 @@ Why declarative systems? Lets say you were tasked with ensuring that all cloud s
     </item>
     
     <item>
-      <title>Python Packages in 2022</title>
-      <link>http://localhost:1313/posts/python-packaging-2022/</link>
+      <title>Python Packaging with Poetry</title>
+      <link>http://localhost:1313/posts/python-packaging-part1/</link>
       <pubDate>Sun, 11 Sep 2022 10:14:31 +0200</pubDate>
       
-      <guid>http://localhost:1313/posts/python-packaging-2022/</guid>
+      <guid>http://localhost:1313/posts/python-packaging-part1/</guid>
       <description>It&amp;rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of setup.py, setup.cfg and pyproject.toml. Before we look at these, it is important to first make sure we properly understand python modules and packages.
 Python Modules In python a module is simply a file with a .</description>
       <content:encoded><![CDATA[<p>It&rsquo;s not suprise that new developers are confused when it comes to developing python libraries, there has been major changes over the years when it comes to how to work with python packages, and currently you may ask yourself what to use out of <code>setup.py</code>, <code>setup.cfg</code> and <code>pyproject.toml</code>. Before we look at these, it is important to first make sure we properly understand python modules and packages.</p>
@@ -111,7 +111,7 @@ Python Modules In python a module is simply a file with a .</description>
 <h3 id="python-packages">Python Packages</h3>
 <p>Python collection of modules intended to be installed and used together. When developing a large application you will probably end up with multiple modules which need to be organized, this is what a package does.</p>
 <p>In python a package (or subpackage) is a folder containing one or more modules and a <code>__init__.py</code> file, which can be empty or contain some initialization code for the package.</p>
-<p><img loading="lazy" src="/posts/python-packaging-2022/images/dairy_processing_package.png" type="" alt="python package hierachy"  /></p>
+<p><img loading="lazy" src="/posts/python-packaging-part1/images/dairy_processing_package.png" type="" alt="python package hierachy"  /></p>
 <p>We can import certain modules from any of these packages using dot notation. For example to import module_1 from the above package, we could use either of the following code snippets</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">dairy_processing.calculations.density</span>
 </span></span></code></pre></div><p>or</p>
