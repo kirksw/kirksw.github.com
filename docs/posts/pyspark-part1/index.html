@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Starting with (py)Spark | MDS</title>
+<meta name="keywords" content="">
+<meta name="description" content="There has been a large shift in the industry in recent years to moving to python for data engineering. Spark one of the leading distributed data processing engines has great support for python via the Pyspark library, allowing users to write high performance distributed data processing on spark from the comfort of python.
+In this article I want to touch on some high-level topics relating to using pyspark which I have seen skimmed over at companies where I have worked at leading to varied and generally poor data pipeline quality.">
+<meta name="author" content="Kirk Sweeney">
+<link rel="canonical" href="https://kirksw.github.io/posts/pyspark-part1/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.min.605ed0f4f9e8691805e7b25947b604a7eeb1483affac31e744a15a935e49ec21.css" integrity="sha256-YF7Q9PnoaRgF57JZR7YEp&#43;6xSDr/rDHnRKFak15J7CE=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://kirksw.github.io/favicon.ico">
+<link rel="apple-touch-icon" href="https://kirksw.github.io/apple-touch-icon.png">
+<link rel="alternate" hreflang="en" href="https://kirksw.github.io/posts/pyspark-part1/">
+
+<meta name="twitter:title" content="Starting with (py)Spark | MDS" />
+<meta name="twitter:description" content="There has been a large shift in the industry in recent years to moving to python for data engineering. Spark one of the leading distributed data processing engines has great support for python via the Pyspark library, allowing users to write high performance distributed data processing on spark from the comfort of python.
+In this article I want to touch on some high-level topics relating to using pyspark which I have seen skimmed over at companies where I have worked at leading to varied and generally poor data pipeline quality." />
+<meta name="twitter:site" content="@novoreorx" />
+<meta name="twitter:creator" content="@novoreorx" />
+<meta property="og:title" content="Starting with (py)Spark | MDS" />
+<meta property="og:description" content="There has been a large shift in the industry in recent years to moving to python for data engineering. Spark one of the leading distributed data processing engines has great support for python via the Pyspark library, allowing users to write high performance distributed data processing on spark from the comfort of python.
+In this article I want to touch on some high-level topics relating to using pyspark which I have seen skimmed over at companies where I have worked at leading to varied and generally poor data pipeline quality." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://kirksw.github.io/posts/pyspark-part1/" />
+<meta property="article:section" content="posts" />
+  <meta property="article:published_time" content="2024-07-28T18:49:34&#43;02:00" />
+  <meta property="article:modified_time" content="2024-07-28T18:49:34&#43;02:00" />
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://kirksw.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Starting with (py)Spark",
+      "item": "https://kirksw.github.io/posts/pyspark-part1/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Starting with (py)Spark | MDS",
+  "name": "Starting with (py)Spark",
+  "description": "There has been a large shift in the industry in recent years to moving to python for data engineering. Spark one of the leading distributed data processing engines has great support for python via the Pyspark library, allowing users to write high performance distributed data processing on spark from the comfort of python.\nIn this article I want to touch on some high-level topics relating to using pyspark which I have seen skimmed over at companies where I have worked at leading to varied and generally poor data pipeline quality.",
+  "keywords": [
+    
+  ],
+  "wordCount" : "1451",
+  "inLanguage": "en",
+  "datePublished": "2024-07-28T18:49:34+02:00",
+  "dateModified": "2024-07-28T18:49:34+02:00",
+  "author":[{
+    "@type": "Person",
+    "name": "Kirk Sweeney"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://kirksw.github.io/posts/pyspark-part1/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "MDS",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://kirksw.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary-bg: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+
+</head>
+
+<body class="" id="top"><script data-no-instant>
+function switchTheme(theme) {
+  switch (theme) {
+    case 'light':
+      document.body.classList.remove('dark');
+      break;
+    case 'dark':
+      document.body.classList.add('dark');
+      break;
+    
+    default:
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+      }
+  }
+}
+
+function isDarkTheme() {
+  return document.body.className.includes("dark");
+}
+
+function getPrefTheme() {
+  return localStorage.getItem("pref-theme");
+}
+
+function setPrefTheme(theme) {
+  switchTheme(theme)
+  localStorage.setItem("pref-theme", theme);
+}
+
+const toggleThemeCallbacks = {}
+toggleThemeCallbacks['main'] = (isDark) => {
+  
+  if (isDark) {
+    setPrefTheme('light');
+  } else {
+    setPrefTheme('dark');
+  }
+}
+
+
+
+
+window.addEventListener('toggle-theme', function() {
+  
+  const isDark = isDarkTheme()
+  for (const key in toggleThemeCallbacks) {
+    toggleThemeCallbacks[key](isDark)
+  }
+});
+
+
+function toggleThemeListener() {
+  
+  window.dispatchEvent(new CustomEvent('toggle-theme'));
+}
+
+</script>
+<script>
+  
+  (function() {
+    const defaultTheme = 'light';
+    const prefTheme = getPrefTheme();
+    const theme = prefTheme ? prefTheme : defaultTheme;
+
+    switchTheme(theme);
+  })();
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://kirksw.github.io/" accesskey="h" title="MDS (Alt + H)">
+                <img src="https://kirksw.github.io/logo.png" alt="logo" aria-label="logo"
+                    height="30">MDS</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </span>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://kirksw.github.io/posts/" title="Posts"
+                >Posts
+                </a>
+            </li>
+            <li>
+                <a href="https://kirksw.github.io/tags/" title="Tags"
+                >Tags
+                </a>
+            </li>
+            <li>
+                <a href="https://kirksw.github.io/archives/" title="Archive"
+                >Archive
+                </a>
+            </li>
+            <li>
+                <a href="https://kirksw.github.io/search/" title="Search (Alt &#43; /)"data-no-instant accesskey=/
+                >Search
+                </a>
+            </li>
+            <li>
+                <a href="https://github.com/kirksw/" title="@Author" target="_blank"
+                >@Author<span class="external-link"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-external-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M11 7h-5a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-5" />
+  <line x1="10" y1="14" x2="20" y2="4" />
+  <polyline points="15 4 20 4 20 9" />
+</svg>
+</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main post">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title">
+      Starting with (py)Spark
+    </h1>
+    <div class="post-meta"><span class="meta-item">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar" style="user-select: text;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" style="user-select: text;"></rect><line x1="16" y1="2" x2="16" y2="6" style="user-select: text;"></line><line x1="8" y1="2" x2="8" y2="6" style="user-select: text;"></line><line x1="3" y1="10" x2="21" y2="10" style="user-select: text;"></line></svg>
+  <span>2024-07-28</span></span>
+
+      
+      
+    </div>
+  </header> 
+  <div class="post-content"><p>There has been a large shift in the industry in recent years to moving to python for data engineering. Spark one of the leading distributed data processing engines has great support for python via the Pyspark library, allowing users to write high performance distributed data processing on spark from the comfort of python.</p>
+<p>In this article I want to touch on some high-level topics relating to using pyspark which I have seen skimmed over at companies where I have worked at leading to varied and generally poor data pipeline quality.</p>
+<h2 id="to-python-or-not-to-python">To python or not to python..<a hidden class="anchor" aria-hidden="true" href="#to-python-or-not-to-python">¶</a></h2>
+<p>One of point important points to consider when building a pipeline is whether python is the best language to use for that use-case? Many pipelines can be more concisely written in SQL and more performant in Java/Scala.</p>
+<p>Generally I believe the best approach is to use the simplest solution which meets the requirements, and then only if necessary move to a more complex solution. No one is going to be impressed if you write a spark job in Java when it could have been done in SQL if both could meet the requirements.</p>
+<p>Additionally if we consider Databricks, if you have a lot of jobs you can end up creating a lot of job clusters and optimizing the sizing can be difficult. Using SQL allows you to target a sql warehouse cluster and let databricks scale this, which could end up minimising latency and reducing costs.</p>
+<p>Generally the flow I have in mind is as below:</p>
+<div class="mermaid">  graph TD;
+    A[SQL] --more flexibility--> B[Python] --more performance--> C[Java/Scala]
+</div>
+<p>There is a however a trade-off for the additional flexibility and performance and that is technical debt, and we should choose the best tool for the users and capabilities of the team. A tech company will have no problem building and running scala jobs, but a company with a lot of data analysts would be best suited to stick to sql with the odd python job.</p>
+<h2 id="notebooks--production">Notebooks != Production<a hidden class="anchor" aria-hidden="true" href="#notebooks--production">¶</a></h2>
+<p>To me notebooks have been marketed as the &ldquo;low code&rdquo; approach for data engineering, but in reality they are a double edged sword. They are great for exploration and prototyping, but when it comes to production they are a nightmare.</p>
+<p>Companies like Databricks heavily promote using notebooks, adding features like version control, co-pilots, etc. Their <del>solutions architects</del> sales people will even recommend them throughout the layers of the company as best practice. There is so much marketing from these companies that some colleagues didn&rsquo;t even know you could submit jobs in another way. Remember if you drink all the cool-aid you aren&rsquo;t using spark you are using databricks.</p>
+<p>Testability is the first big issue which comes to mind with notebooks, If we consider the databricks variety they have a lot of magic variables injected such as the spark context, dbutils, widgets, etc. Additionally if you want to write unit tests, these should be run in a CI/CD pipeline, and running a notebook in a cicd pipeline sounds like a nightmare. So you would have to convert the notebook to a python package, which then begs the question why do you need the notebook anymore?</p>
+<p>There are other issues such as development in a proper IDE being much more efficient than in a notebook, that it&rsquo;s easier to reuse code between python packages.</p>
+<p>What then is the solution? I would recommend using notebooks for exploration and prototyping if you need to, but then taking the explicit step of converting the code to a python package for production. This way you get the best of both worlds, and you can ensure that your code is testable, maintainable and reusable.</p>
+<h2 id="to-write-performant-code-use-the-pyspark-api-and-connectors-you-must">To write performant code, use the pyspark api and connectors you must<a hidden class="anchor" aria-hidden="true" href="#to-write-performant-code-use-the-pyspark-api-and-connectors-you-must">¶</a></h2>
+<p>Did you know all the non-pyspark python code you run only executes on the driver node? Yea that 5 node spark cluster you have is only running with maximum 20% utilization, sounds expensive and slow right?</p>
+<p>You would be surprised in how many instances I have seen write code like below, which fetches synchronously pulls data from an api and then creates a dataframe from it. Only the last 4 lines are executed in a distributed fashion. The writing is done using a connector which is optimised for distributed writing.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">f</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># synchronous fetch on driver node</span>
+</span></span><span class="line"><span class="cl"><span class="n">record_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl"><span class="n">records</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&#34;https://api.example.com/records&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">record_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># create dataframe from list (backed by RDDs which are distributed)</span>
+</span></span><span class="line"><span class="cl"><span class="n">record_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">record_list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># distributed execution</span>
+</span></span><span class="line"><span class="cl"><span class="n">bad_records</span> <span class="o">=</span> <span class="n">record_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;status&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&#34;bad&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">good_records</span> <span class="o">=</span> <span class="n">record_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;status&#34;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&#34;good&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">good_records</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&#34;product_name.staging.good_records&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bad_records</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&#34;product_name.staging.bad_records&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>One of the most important things to remember when working with spark via python - is to heavily use built in functions from pyspark - and I would be more strict use only the dataframe api, with UDFs only if necessary. These functions utilise the native and high performance jvm (or c++*) libraries of spark to ensure your data is processed blazingly fast in a distributed fashion.</p>
+<p>I have found the dataframe api to be brilliant for most use-cases, have supported a lot of colleagues over the years convert their python code into the dataframe api with huge performance improvements. I would recommend avoiding the RDD api unless you need to, as it is much easier to write non-performant code.</p>
+<p>I would also encourage you to use native spark connectors for reading and writing data, as these are written in scala and optimised for distributed reading and writing. However Spark 4.0 will expose a python data source API to make building distributed connectors in python possible. As the spark kafka connector is very good, I would recommend using kafka as the common interface for streaming data, replicating data from other sources using tools like kafka connect. Batch data can be easily and efficiently read from s3 or other storage systems using the native spark connectors.</p>
+<p>| Note: you can use <code>pandas api on spark</code> but honestly don&rsquo;t it was essentially integrated because there is a lot of legacy pandas code, modern libraries like polars have a more consistent api and are similar to the dataframe api in that both are based on lazy execution.</p>
+<h2 id="chaining-transformations">Chaining transformations<a hidden class="anchor" aria-hidden="true" href="#chaining-transformations">¶</a></h2>
+<p>One thing I see quite often is a pipeline which started simple, but as requirements grew the pipeline became more complex and the logic becomes harder to maintain. Here the <code>transform</code> function can be used to chain complex transformations together, and keep the codebase clean and maintainable by breaking the complexity into logically function chunks.</p>
+<p>Below is an example from a pokemon interview challenge I did a while back, where the code is broken into smaller functions which are chained together to create the final dataframe, imagine what this would look like if it all was one big chain - yuck! I hope you can see how this can be used as a tool to keep the codebase clean and maintainable, you could imagine that each of these functions was a requirement and so I could unit test each of them to ensure I am meeting the requirements.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">load_pokemon</span><span class="p">(</span><span class="n">spark</span><span class="p">:</span> <span class="n">SparkSession</span><span class="p">,</span> <span class="n">pokemon_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&#34;json&#34;</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&#34;multiline&#34;</span><span class="p">,</span> <span class="s2">&#34;true&#34;</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="n">detailed_pokemon_schema</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pokemon_path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">parse_games</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">games</span><span class="o">=</span><span class="p">[</span><span class="s2">&#34;red&#34;</span><span class="p">,</span> <span class="s2">&#34;blue&#34;</span><span class="p">,</span> <span class="s2">&#34;leafgreen&#34;</span><span class="p">,</span> <span class="s2">&#34;white&#34;</span><span class="p">]):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;filter for only pokemon that are specified in the game list&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">group_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&#34;id&#34;</span><span class="p">,</span> <span class="s2">&#34;name&#34;</span><span class="p">,</span> <span class="s2">&#34;base_experience&#34;</span><span class="p">,</span> <span class="s2">&#34;weight&#34;</span><span class="p">,</span> <span class="s2">&#34;height&#34;</span><span class="p">,</span> <span class="s2">&#34;order&#34;</span><span class="p">,</span> <span class="s2">&#34;types&#34;</span><span class="p">,</span> <span class="s2">&#34;sprites&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">df</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="s2">&#34;game_indices.version.name&#34;</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">games</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="o">*</span><span class="n">group_cols</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">collect_list</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">parse_types</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;parse types into a mapping&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">df_join</span> <span class="o">=</span> <span class="n">df</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;types&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="s2">&#34;types&#34;</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;type_slot&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">lit</span><span class="p">(</span><span class="s2">&#34;type_slot_&#34;</span><span class="p">),</span> <span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;types.slot&#34;</span><span class="p">)))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;type_name&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;types.type.name&#34;</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s2">&#34;name&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s2">&#34;type_slot&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">first</span><span class="p">(</span><span class="s2">&#34;type_name&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_join</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&#34;name&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&#34;types&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">parse_sprite</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;parse front_default sprite to be used a sprite&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">df</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;sprite&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;sprites.front_default&#34;</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&#34;sprites&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">calculate_bmi</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;calculates pokemon bmi (weight / height^2)&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;bmi&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;weight&#34;</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;height&#34;</span><span class="p">),</span> <span class="n">f</span><span class="o">.</span><span class="n">lit</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">capitalize_name</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;capitalizes first letter of pokemon name&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">capitalize_first</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;name&#34;</span><span class="p">,</span> <span class="n">capitalize_first</span><span class="p">(</span><span class="s2">&#34;name&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;sample code&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ss</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">master</span><span class="p">(</span><span class="s2">&#34;local[*]&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">&#34;pokemon&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">df_poke</span> <span class="o">=</span> <span class="n">load_pokemon</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="s2">&#34;data/raw/pokemon/*.json&#34;</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">explode</span><span class="p">(</span><span class="s2">&#34;game_indices.version.name&#34;</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">games</span><span class="p">))</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="o">*</span><span class="n">group_cols</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">collect_list</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&#34;games&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">parse_sprite</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">parse_types</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">calculate_bmi</span><span class="p">)</span> \
+</span></span><span class="line"><span class="cl">        <span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">capitalize_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">df_poke</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&#34;overwrite&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">parquet</span><span class="p">(</span><span class="s2">&#34;pokemon_processed&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><h2 id="summary">Summary<a hidden class="anchor" aria-hidden="true" href="#summary">¶</a></h2>
+<p>I hope this somewhat high-level collection of thoughts can help when building spark pipelines in python. I have seen a lot of pipelines which have been built in a sub-optimal way, and I hope this can help you avoid some of the pitfalls I have seen. If I write a part 2 it will be around testing and deployment side of this.</p>
+<p>I&rsquo;m not using spark that much at my current company as we are dealing with more complex real-time streaming use-cases, where we are using DataFlow (Apache Beam) together with BigQuery, Kafka, Airflow &amp; DBT.</p>
+<p>Let me know if you have any thoughts or questions, I would love to hear them.</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+  </footer><div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "kswe" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</article>
+
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true });
+</script>
+
+    </main>
+    
+<footer class="footer">
+  <span>&copy; 2024 <a href="https://kirksw.github.io/">MDS</a></span><span style="display: inline-block; margin-left: 1em;">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA</a>
+  </span>
+  <span style="display: inline-block; margin-left: 1em;">
+    Powered by
+    <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+    <a href="https://github.com/reorx/hugo-PaperModX/" rel="noopener" target="_blank">PaperModX</a>
+  </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+    <path d="M12 6H0l6-6z" />
+  </svg>
+</a>
+
+<script>
+  (function() {
+     
+    const disableThemeToggle = '' == '1';
+    if (disableThemeToggle) {
+      return;
+    }
+
+    let button = document.getElementById("theme-toggle")
+    
+    button.removeEventListener('click', toggleThemeListener)
+    
+    button.addEventListener('click', toggleThemeListener)
+  })();
+</script>
+
+<script>
+  (function () {
+    let menu = document.getElementById('menu')
+    if (menu) {
+      menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+      menu.onscroll = function () {
+        localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+      }
+    }
+
+    const disableSmoothScroll = '' == '1';
+    const enableInstantClick = '' == '1';
+    
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || disableSmoothScroll || enableInstantClick) {
+      return;
+    }
+    
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        var id = this.getAttribute("href").substr(1);
+        document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+          behavior: "smooth"
+        });
+        if (id === "top") {
+          history.replaceState(null, null, " ");
+        } else {
+          history.pushState(null, null, `#${id}`);
+        }
+      });
+    });
+  })();
+</script>
+<script>
+  var mybutton = document.getElementById("top-link");
+  window.onscroll = function () {
+    if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+      mybutton.style.visibility = "visible";
+      mybutton.style.opacity = "1";
+    } else {
+      mybutton.style.visibility = "hidden";
+      mybutton.style.opacity = "0";
+    }
+  };
+</script>
+<script>
+  if (window.scrollListeners) {
+    
+    for (const listener of scrollListeners) {
+      window.removeEventListener('scroll', listener)
+    }
+  }
+  window.scrollListeners = []
+</script>
+
+
+
+<script src="/js/medium-zoom.min.js" data-no-instant
+></script>
+
+
+
+
+<script>
+  
+  
+  (function() {
+    const enableTocScroll = '' == '1'
+    if (!enableTocScroll) {
+      return
+    }
+    if (!document.querySelector('.toc')) {
+      console.log('no toc found, ignore toc scroll')
+      return
+    }
+    
+
+    
+    const scrollListeners = window.scrollListeners
+    const headings = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id]');
+    const activeClass = 'active';
+
+    
+    let activeHeading = headings[0];
+    getLinkByHeading(activeHeading).classList.add(activeClass);
+
+    const onScroll = () => {
+      const passedHeadings = [];
+      for (const h of headings) {
+        
+        if (getOffsetTop(h) < 5) {
+          passedHeadings.push(h)
+        } else {
+          break;
+        }
+      }
+      if (passedHeadings.length > 0) {
+        newActiveHeading = passedHeadings[passedHeadings.length - 1];
+      } else {
+        newActiveHeading = headings[0];
+      }
+      if (activeHeading != newActiveHeading) {
+        getLinkByHeading(activeHeading).classList.remove(activeClass);
+        activeHeading = newActiveHeading;
+        getLinkByHeading(activeHeading).classList.add(activeClass);
+      }
+    }
+
+    let timer = null;
+    const scrollListener = () => {
+      if (timer !== null) {
+        clearTimeout(timer)
+      }
+      timer = setTimeout(onScroll, 50)
+    }
+    window.addEventListener('scroll', scrollListener, false);
+    scrollListeners.push(scrollListener)
+
+    function getLinkByHeading(heading) {
+      const id = encodeURI(heading.getAttribute('id')).toLowerCase();
+      return document.querySelector(`.toc ul li a[href="#${id}"]`);
+    }
+
+    function getOffsetTop(heading) {
+      if (!heading.getClientRects().length) {
+        return 0;
+      }
+      let rect = heading.getBoundingClientRect();
+      return rect.top
+    }
+  })();
+  </script>
+
+</body>
+
+</html>
