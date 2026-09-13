@@ -1,7 +1,26 @@
 ---
 import Layout from '../components/Layout.astro';
-
+import PostCard from '../components/PostCard.astro';
+import { allPosts, terms } from '../lib/posts';
+const posts = await allPosts();
+const topics = terms(posts, 'tags');
 ---
-<Layout>
-  <div class="profile"><div class="profile_inner"><img src="/logo.png" alt="profile image" width="200" height="200" /><h1>Data solutions for a modern world</h1><div class="post-content" style="text-align: left;"><p>Hi I'm Kirk and I build data platforms and data solutions for a living. I built these in all leading cloud platforms, and have worked with a variety of data technologies such as Spark/Databricks, Kafka, Pulsar, Kubernetes, Apache Beam, and many more. I love to learn new things and I created this blog as a place to share some of my learnings. Feel free to ask questions right below each blog post, or send a message via <a href="https://www.linkedin.com/in/kirk-sweeney/">linkedin</a>.</p><h2>Topics covered in the realms of</h2><ul><li>Data platform paradigms (Lakehouses, Data-mesh, etc)</li><li>Data Engineering (SQL, Spark, Flink, etc)</li><li>Software Development (Python, Java, Rust, etc)</li><li>DevOps workflow (Kubernetes, CICD, Terraform, ArgoCD, etc)</li></ul><h2>My working principals</h2><ul><li>We must be customer and people obsessed</li><li>To truly understand our customers problems we must be able to work closely with them</li><li>Investing in tooling is a necessity to ensure we can continuously release working software</li><li>We strive to minimize any processes which slow down how quickly we can react to change</li><li>The best teams are build on a foundation of trust, both within the team and from management</li></ul></div><div class="social-icons"><a href="https://www.linkedin.com/in/kirk-sweeney/" rel="noopener">LinkedIn</a><a href="https://github.com/kirksw" rel="noopener">GitHub</a><a href="https://www.buymeacoffee.com/kswe" rel="noopener">Buy me a coffee</a><a href="https://stackoverflow.com/users/7362737/kirk" rel="noopener">Stackoverflow</a></div><div class="buttons"><a class="button" href="/posts/"><span class="button-inner">Posts</span></a><a class="button" href="/tags/"><span class="button-inner">Tags</span></a></div></div></div>
+<Layout title="Systems Journal" description="Kirk Sweeney writes about data engineering, software, and systems.">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Systems Journal / Kirk Sweeney</p>
+      <h1>Data solutions for a modern world.</h1>
+      <p class="hero-lede">Notes from building data platforms and software: practical patterns, sharp edges, and things worth learning in public.</p>
+      <div class="buttons"><a class="button" href="/posts/">Read the writing</a><a class="button" href="/about/">About Kirk</a></div>
+    </div>
+    <aside class="hero-aside"><p class="eyebrow">Current focus</p><p>Data platforms, engineering, software development, and DevOps workflows.</p><p><a href="/projects/">See the projects →</a></p></aside>
+  </section>
+  <section aria-labelledby="recent-heading">
+    <div class="section-heading"><h2 id="recent-heading">Recent writing</h2><a href="/posts/">All posts →</a></div>
+    <div class="post-list">{posts.slice(0, 4).map((post) => <PostCard post={post} />)}</div>
+  </section>
+  <section aria-labelledby="topics-heading">
+    <div class="section-heading"><h2 id="topics-heading">Topics</h2><a href="/tags/">Browse all →</a></div>
+    <ul class="topic-list">{topics.map((topic) => <li><a href={`/tags/${topic}/`}>{topic}</a></li>)}</ul>
+  </section>
 </Layout>

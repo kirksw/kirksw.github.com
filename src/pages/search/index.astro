@@ -2,21 +2,30 @@
 import Layout from '../../components/Layout.astro';
 const indexUrl = '/index.json';
 ---
-<Layout title="Search"><header class="page-header"><h1>Search</h1></header><div id="searchbox"><input id="searchInput" type="search" placeholder="Search posts" aria-label="Search posts" /></div><ul id="searchResults"></ul><script is:inline define:vars={{ indexUrl }}>
-  const input = document.querySelector('#searchInput');
-  const results = document.querySelector('#searchResults');
-  const renderResults = (posts, query) => {
-    results.replaceChildren();
-    posts.filter((post) => `${post.title} ${post.content} ${post.tags.join(' ')}`.toLowerCase().includes(query)).slice(0, 20).forEach((post) => {
-      const item = document.createElement('li');
-      const link = document.createElement('a');
-      link.href = post.permalink;
-      link.textContent = post.title;
-      const date = document.createElement('small');
-      date.textContent = post.date;
-      item.append(link, document.createElement('br'), date);
-      results.append(item);
-    });
-  };
-  fetch(indexUrl).then((response) => response.json()).then((posts) => input?.addEventListener('input', () => renderResults(posts, input.value.toLowerCase().trim())));
-</script></Layout>
+<Layout title="Search" description="Search Kirk Sweeney's writing.">
+  <section class="content-width">
+    <header class="page-header"><p class="eyebrow">Index</p><h1>Search the writing</h1></header>
+    <form class="search-form" id="search-form" role="search"><label class="sr-only" for="searchInput">Search posts</label><input id="searchInput" type="search" placeholder="Try “Kubernetes”" autocomplete="off" /><button class="button" type="submit">Search</button></form>
+    <p id="searchStatus" role="status" aria-live="polite">Enter a term to search.</p>
+    <ul class="search-results" id="searchResults"></ul>
+    <noscript><p>JavaScript is required for search. Browse <a href="/posts/">all posts</a> or <a href="/tags/">topics</a> instead.</p></noscript>
+  </section>
+  <script is:inline define:vars={{ indexUrl }}>
+    const form = document.querySelector('#search-form');
+    const input = document.querySelector('#searchInput');
+    const results = document.querySelector('#searchResults');
+    const status = document.querySelector('#searchStatus');
+    let posts = null;
+    let timer;
+    const search = (query) => {
+      results.replaceChildren();
+      if (!query) { status.textContent = 'Enter a term to search.'; return; }
+      const found = posts.filter((post) => `${post.title} ${post.content} ${post.tags.join(' ')}`.toLocaleLowerCase().includes(query)).slice(0, 20);
+      status.textContent = found.length ? `${found.length} result${found.length === 1 ? '' : 's'} found.` : 'No posts match that search.';
+      found.forEach((post) => { const item = document.createElement('li'); const link = document.createElement('a'); link.href = post.permalink; link.textContent = post.title; const date = document.createElement('small'); date.textContent = ` ${post.date}`; item.append(link, date); results.append(item); });
+    };
+    const load = async () => { if (posts) return posts; const response = await fetch(indexUrl); if (!response.ok) throw new Error('Search index unavailable'); posts = await response.json(); return posts; };
+    form?.addEventListener('submit', (event) => { event.preventDefault(); clearTimeout(timer); load().then(() => search(input.value.trim().toLocaleLowerCase())).catch(() => { status.textContent = 'Search is temporarily unavailable. Browse the posts instead.'; }); });
+    input?.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { if (!input.value.trim()) { search(''); return; } load().then(() => search(input.value.trim().toLocaleLowerCase())).catch(() => { status.textContent = 'Search is temporarily unavailable.'; }); }, 180); });
+  </script>
+</Layout>
