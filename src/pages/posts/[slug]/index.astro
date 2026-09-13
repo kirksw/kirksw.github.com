@@ -1,0 +1,13 @@
+---
+import { render } from 'astro:content';
+import Layout from '../../../components/Layout.astro';
+import { allPosts, postSlug, postUrl, type Post } from '../../../lib/posts';
+export async function getStaticPaths() { return (await allPosts()).map((post) => ({ params: { slug: postSlug(post) }, props: { post } })); }
+const { post } = Astro.props as { post: Post };
+const { Content } = await render(post);
+const posts = await allPosts();
+const position = posts.findIndex((item) => item.id === post.id);
+const previous = posts[position + 1];
+const next = posts[position - 1];
+---
+<Layout title={post.data.title} description={post.data.summary} type="article"><article class="post-single"><header class="post-header"><a href="/posts/">Posts</a><h1 class="post-title">{post.data.title}{post.data.draft && <sup><span class="entry-isdraft"> [draft]</span></sup>}</h1><div class="post-meta"><time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>{post.data.tags.length > 0 && <> · {post.data.tags.map((tag: string, index: number) => <span>{index ? ', ' : ''}<a href={`/tags/${tag}/`}>{tag}</a></span>)}</>}</div></header><div class="post-content"><Content /></div><footer class="post-footer"><ul class="post-tags">{post.data.tags.map((tag: string) => <li><a href={`/tags/${tag}/`}>#{tag}</a></li>)}</ul><nav class="paginav">{previous && <a class="prev" href={postUrl(previous)}>← <span class="title">{previous.data.title}</span></a>}{next && <a class="next" href={postUrl(next)}><span class="title">{next.data.title}</span> →</a>}</nav></footer>{!import.meta.env.DEV && <div class="comments"><h2>Comments</h2><div id="disqus_thread"></div><script is:inline define:vars={{ url: new URL(Astro.url.pathname, Astro.site).href }}>window.disqus_config = function () { this.page.url = url; }; const script = document.createElement('script'); script.src = 'https://kswe.disqus.com/embed.js'; script.setAttribute('data-timestamp', String(Date.now())); (document.head || document.body).appendChild(script);</script></div>}</article></Layout>

@@ -1,0 +1,22 @@
+---
+import Layout from '../../components/Layout.astro';
+const indexUrl = '/index.json';
+---
+<Layout title="Search"><header class="page-header"><h1>Search</h1></header><div id="searchbox"><input id="searchInput" type="search" placeholder="Search posts" aria-label="Search posts" /></div><ul id="searchResults"></ul><script is:inline define:vars={{ indexUrl }}>
+  const input = document.querySelector('#searchInput');
+  const results = document.querySelector('#searchResults');
+  const renderResults = (posts, query) => {
+    results.replaceChildren();
+    posts.filter((post) => `${post.title} ${post.content} ${post.tags.join(' ')}`.toLowerCase().includes(query)).slice(0, 20).forEach((post) => {
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = post.permalink;
+      link.textContent = post.title;
+      const date = document.createElement('small');
+      date.textContent = post.date;
+      item.append(link, document.createElement('br'), date);
+      results.append(item);
+    });
+  };
+  fetch(indexUrl).then((response) => response.json()).then((posts) => input?.addEventListener('input', () => renderResults(posts, input.value.toLowerCase().trim())));
+</script></Layout>

@@ -1,0 +1,7 @@
+---
+import Layout from '../../components/Layout.astro';
+import { allPosts, postUrl } from '../../lib/posts';
+const posts = await allPosts();
+const years = [...new Set(posts.map((post) => post.data.date.getFullYear()))];
+---
+<Layout title="Archive"><header class="page-header"><h1>Archive</h1></header><div class="archive-posts">{years.map((year) => <section class="archive-year"><h2>{year}</h2>{posts.filter((post) => post.data.date.getFullYear() === year).map((post) => <div class="archive-entry"><h3 class="archive-entry-title"><a href={postUrl(post)}>{post.data.title}</a></h3><div class="archive-meta">{post.data.date.toISOString().slice(0, 10)}</div></div>)}</section>)}</div></Layout>

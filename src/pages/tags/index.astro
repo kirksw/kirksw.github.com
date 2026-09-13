@@ -1,0 +1,6 @@
+---
+import Layout from '../../components/Layout.astro';
+import { allPosts, terms } from '../../lib/posts';
+const tags = terms(await allPosts(), 'tags');
+---
+<Layout title="Tags"><header class="page-header"><h1>Tags</h1></header><ul class="terms-tags">{tags.map((tag) => <li><a href={`/tags/${tag}/`}>{tag}</a></li>)}</ul></Layout>

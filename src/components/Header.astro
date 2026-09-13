@@ -1,0 +1,12 @@
+<header class="header">
+  <nav class="nav" aria-label="Main navigation">
+    <div class="logo"><a href="/" accesskey="h"><img src="/logo.png" width="30" height="30" alt="" />MDS</a></div>
+    <ul id="menu"><li><a href="/posts/">Posts</a></li><li><a href="/tags/">Tags</a></li><li><a href="/archives/">Archive</a></li><li><a href="/search/">Search</a></li><li><a href="https://github.com/kirksw" rel="noopener">@Author</a></li><li><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle color theme">☼</button></li></ul>
+  </nav>
+  <script is:inline>
+    const button = document.querySelector('#theme-toggle');
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) document.body.classList.add('dark');
+    button?.addEventListener('click', () => { document.body.classList.toggle('dark'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); });
+  </script>
+</header>
