@@ -31,7 +31,7 @@ const expectedRoutes = [
   'index.html', '404.html', 'posts/index.html', 'posts/index.xml',
   'tags/index.html', 'tags/index.xml', 'categories/index.html', 'categories/index.xml',
   'archives/index.html', 'search/index.html', 'index.xml', 'index.json', 'sitemap.xml',
-  ...slugs.filter((slug) => slug !== 'mill-jvm-builds').map((slug) => `posts/${slug}/index.html`),
+  ...slugs.map((slug) => `posts/${slug}/index.html`),
   'tags/agents/index.xml', 'tags/ai/index.xml', 'tags/kubernetes/index.xml', 'tags/nix/index.xml',
   'tags/poetry/index.xml', 'tags/python/index.xml', 'tags/sdlc/index.xml',
   'tags/software-development/index.xml', 'tags/terraform/index.xml',
@@ -42,8 +42,8 @@ for (const route of expectedRoutes) {
 
 const builtFiles = await filesUnder(outputDir);
 const builtText = (await Promise.all(builtFiles.filter((file) => /\.(html|xml|json|js)$/.test(file)).map((file) => readFile(file, 'utf8')))).join('\n');
-assert.ok(!builtText.includes('sbt 2 Is Here. Why Consider Mill?'), 'draft title leaked into production output');
-assert.ok(!builtText.includes('mill-jvm-builds'), 'draft route or link leaked into production output');
+assert.ok(!builtText.includes('Private draft fixture'), 'draft title leaked into production output');
+assert.ok(!builtText.includes('__test-draft-fixture'), 'draft route or link leaked into production output');
 await stat(join(outputDir, 'posts/agentic-sdlc/images/agentic-sdlc-infographic.webp'));
 await stat(join(outputDir, 'posts/python-packaging-part1/images/dairy_processing_package.png'));
 const imagePairs = [

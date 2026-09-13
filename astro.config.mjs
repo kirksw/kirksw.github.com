@@ -2,8 +2,8 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 
 export default defineConfig({
-  site: 'https://kirksw.github.io',
-  outDir: './docs',
+  site: 'https://cntd.io',
+  outDir: './dist',
   build: { format: 'directory' },
   integrations: [mdx()],
   image: { layout: 'constrained', responsiveStyles: true },

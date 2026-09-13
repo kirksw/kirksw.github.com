@@ -42,7 +42,10 @@ Build the static site with:
 make build
 ```
 
-The hosting output is `docs/`.
+The build output is `dist/`.
+GitHub Actions builds and deploys it to <https://cntd.io/> on every push to `main`.
+Pull requests run the same checks without deploying.
+The tracked `docs/` directory is legacy Hugo output and is no longer the publishing source.
 To avoid changing tracked hosting output while validating, override Astro's output directory:
 
 ```sh

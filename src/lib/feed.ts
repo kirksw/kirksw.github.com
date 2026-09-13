@@ -4,7 +4,7 @@ import { excerpt, postUrl } from './posts';
 const escapeXml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export function feedResponse(title: string, path: string, posts: Post[], site: URL | undefined) {
-  const base = site ?? new URL('https://kirksw.github.io/');
+  const base = site ?? new URL('https://cntd.io/');
   const link = new URL(path, base).toString();
   const items = posts.map((post) => {
     const url = new URL(postUrl(post), base).toString();
