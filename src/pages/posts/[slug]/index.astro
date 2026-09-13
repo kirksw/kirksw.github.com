@@ -1,13 +1,52 @@
 ---
 import { render } from 'astro:content';
 import Layout from '../../../components/Layout.astro';
-import { allPosts, postSlug, postUrl, type Post } from '../../../lib/posts';
+import { allPosts, postSlug, postUrl, readingTime, type Post } from '../../../lib/posts';
 export async function getStaticPaths() { return (await allPosts()).map((post) => ({ params: { slug: postSlug(post) }, props: { post } })); }
 const { post } = Astro.props as { post: Post };
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 const posts = await allPosts();
 const position = posts.findIndex((item) => item.id === post.id);
 const previous = posts[position + 1];
 const next = posts[position - 1];
+const hasToc = headings.length > 1;
 ---
-<Layout title={post.data.title} description={post.data.summary} type="article"><article class="post-single"><header class="post-header"><a href="/posts/">Posts</a><h1 class="post-title">{post.data.title}{post.data.draft && <sup><span class="entry-isdraft"> [draft]</span></sup>}</h1><div class="post-meta"><time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>{post.data.tags.length > 0 && <> · {post.data.tags.map((tag: string, index: number) => <span>{index ? ', ' : ''}<a href={`/tags/${tag}/`}>{tag}</a></span>)}</>}</div></header><div class="post-content"><Content /></div><footer class="post-footer"><ul class="post-tags">{post.data.tags.map((tag: string) => <li><a href={`/tags/${tag}/`}>#{tag}</a></li>)}</ul><nav class="paginav">{previous && <a class="prev" href={postUrl(previous)}>← <span class="title">{previous.data.title}</span></a>}{next && <a class="next" href={postUrl(next)}><span class="title">{next.data.title}</span> →</a>}</nav></footer>{!import.meta.env.DEV && <div class="comments"><h2>Comments</h2><div id="disqus_thread"></div><script is:inline define:vars={{ url: new URL(Astro.url.pathname, Astro.site).href }}>window.disqus_config = function () { this.page.url = url; }; const script = document.createElement('script'); script.src = 'https://kswe.disqus.com/embed.js'; script.setAttribute('data-timestamp', String(Date.now())); (document.head || document.body).appendChild(script);</script></div>}</article></Layout>
+<Layout title={post.data.title} description={post.data.summary} type="article">
+  <article class="post-single">
+    <header class="post-header"><a href="/posts/">Writing /</a><h1>{post.data.title}</h1>{post.data.draft && <span class="draft-label">Draft / local preview</span>}<div class="post-meta"><time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time><span>{readingTime(post.body)} min read</span>{post.data.tags.map((tag: string) => <a href={`/tags/${tag}/`}>#{tag}</a>)}</div></header>
+    {hasToc && <details class="toc" open><summary>On this page</summary><ol>{headings.map((heading: { slug: string; text: string }) => <li><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ol></details>}
+    <div class="post-content"><Content /></div>
+    <footer class="post-footer"><ul class="post-tags">{post.data.tags.map((tag: string) => <li><a href={`/tags/${tag}/`}>#{tag}</a></li>)}</ul><nav class="paginav" aria-label="Post navigation">{previous && <a class="prev" href={postUrl(previous)}>← {previous.data.title}</a>}{next && <a class="next" href={postUrl(next)}>{next.data.title} →</a>}</nav></footer>
+    {!import.meta.env.DEV && <section class="comments" aria-labelledby="comments-heading"><h2 id="comments-heading">Comments</h2><details><summary>Load Disqus comments</summary><div id="disqus_thread"></div><script is:inline define:vars={{ url: new URL(Astro.url.pathname, Astro.site).href }}>const details = document.currentScript?.closest('details'); details?.addEventListener('toggle', () => { if (!details.open || details.dataset.loaded) return; details.dataset.loaded = 'true'; window.disqus_config = function () { this.page.url = url; }; const script = document.createElement('script'); script.src = 'https://kswe.disqus.com/embed.js'; script.setAttribute('data-timestamp', String(Date.now())); document.body.appendChild(script); });</script></details></section>}
+  </article>
+</Layout>
+
+<script>
+  document.querySelectorAll<HTMLPreElement>('.post-content pre').forEach((pre) => {
+    if (pre.parentElement?.classList.contains('code-block')) return;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block';
+    pre.before(wrapper);
+    wrapper.append(pre);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = 'Copy code';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.querySelector('code')?.textContent ?? pre.textContent ?? '');
+        button.textContent = 'Copied';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(pre.querySelector('code') ?? pre);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        button.textContent = 'Selected: press Ctrl/Cmd+C';
+      }
+      window.setTimeout(() => { button.textContent = 'Copy code'; }, 2000);
+    });
+    wrapper.append(button);
+  });
+</script>

@@ -8,7 +8,23 @@ export async function allPosts(): Promise<Post[]> {
   return visible.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
-export function postSlug(post: Post) { return post.id.replace(/\/index\.md$/, '').replace(/\.md$/, ''); }
+export function postSlug(post: Post | { id: string }) {
+  return post.id.replace(/\/(?:index\.)?(?:md|mdx)$/, '').replace(/\.(?:md|mdx)$/, '');
+}
+
 export function postUrl(post: Post) { return `/posts/${postSlug(post)}/`; }
-export function excerpt(post: Post) { return post.data.summary ?? post.body.split(/\n\s*\n/)[0].replace(/^#+\s+/, '').slice(0, 180); }
+export function excerpt(post: Post) {
+  return post.data.summary ?? post.body.replace(/^---[\s\S]*?---\s*/, '').split(/\n\s*\n/)[0].replace(/^#+\s+/, '').slice(0, 180);
+}
 export function terms(posts: Post[], key: 'tags') { return [...new Set(posts.flatMap((post) => post.data[key]))].sort((a, b) => a.localeCompare(b)); }
+
+export function readingTime(body: string) {
+  const prose = body.replace(/^---[\s\S]*?---\s*/, '').replace(/```[\s\S]*?```/g, ' ').replace(/`[^`]*`/g, ' ');
+  const words = prose.match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu)?.length ?? 0;
+  return Math.max(1, Math.ceil(words / 220));
+}
+
+export function searchableText(post: Post) {
+  return [post.data.title, post.data.summary, post.data.description, post.data.tags.join(' '), post.body]
+    .filter(Boolean).join(' ').toLocaleLowerCase();
+}

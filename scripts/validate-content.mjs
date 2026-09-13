@@ -46,6 +46,11 @@ assert.ok(!builtText.includes('sbt 2 Is Here. Why Consider Mill?'), 'draft title
 assert.ok(!builtText.includes('mill-jvm-builds'), 'draft route or link leaked into production output');
 await stat(join(outputDir, 'posts/agentic-sdlc/images/agentic-sdlc-infographic.webp'));
 await stat(join(outputDir, 'posts/python-packaging-part1/images/dairy_processing_package.png'));
+const imagePairs = [
+  ['public/posts/agentic-sdlc/images/agentic-sdlc-infographic.webp', 'src/content/posts/agentic-sdlc/images/agentic-sdlc-infographic.webp'],
+  ['public/posts/python-packaging-part1/images/dairy_processing_package.png', 'src/content/posts/python-packaging-part1/images/dairy_processing_package.png'],
+];
+for (const [publicPath, sourcePath] of imagePairs) assert.deepEqual(await readFile(publicPath), await readFile(sourcePath), `Image copy differs: ${sourcePath}`);
 
 const postPages = builtFiles.filter((file) => file.includes(`${join('posts')}${'/'}`) && file.endsWith('index.html'));
 for (const page of postPages) {

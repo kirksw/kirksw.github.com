@@ -1,10 +1,16 @@
 import { defineConfig } from 'astro/config';
-import { unified } from '@astrojs/markdown-remark';
-import postImages from './src/plugins/post-images.mjs';
+import mdx from '@astrojs/mdx';
 
 export default defineConfig({
   site: 'https://kirksw.github.io',
   outDir: './docs',
   build: { format: 'directory' },
-  markdown: { processor: unified({ remarkPlugins: [postImages] }) },
+  integrations: [mdx()],
+  image: { layout: 'constrained', responsiveStyles: true },
+  markdown: {
+    shikiConfig: {
+      themes: { light: 'github-light', dark: 'github-dark-dimmed' },
+      defaultColor: false,
+    },
+  },
 });

@@ -60,3 +60,16 @@ Post image URLs retain the existing `/posts/<slug>/images/...` paths.
 Create a new Markdown post in `src/content/posts/` with frontmatter matching the existing posts.
 
 The `agentic-sdlc` static page and `CNAME` are retained in `public/`.
+
+## Systems Journal design
+
+The site uses self-hosted Space Grotesk, DM Sans, and IBM Plex Mono fonts with a sage and deep-green palette.
+About and Projects use existing repository information.
+Articles include reading time, a table of contents, dual-theme syntax highlighting, and copy-code buttons.
+Comments load only when the reader opens the Disqus control.
+
+Markdown and MDX posts are supported in `src/content/posts/`.
+MDX is trusted repository code and can import components; do not use untrusted submissions without review.
+Put optimized article images beside each post in its `images/` directory.
+Keep existing public image copies when preserving legacy URLs; tests check the migrated copies for equality.
+`npm test` temporarily creates an MDX fixture and removes it afterward; do not run simultaneous test builds in the same checkout.

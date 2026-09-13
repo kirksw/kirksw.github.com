@@ -4,4 +4,4 @@ import PostsList from '../../components/PostsList.astro';
 import { allPosts } from '../../lib/posts';
 const posts = await allPosts();
 ---
-<Layout title="Posts"><header class="page-header"><h1>Posts</h1></header><PostsList posts={posts} /></Layout>
+<Layout title="Posts"><header class="page-header"><p class="eyebrow">Systems Journal</p><h1>Writing</h1><p>Notes on data engineering, software, and systems.</p></header><PostsList posts={posts} /></Layout>

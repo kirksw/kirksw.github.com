@@ -3,4 +3,4 @@ import type { Post } from '../lib/posts';
 import PostCard from './PostCard.astro';
 const { posts } = Astro.props as { posts: Post[] };
 ---
-{posts.length ? posts.map((post) => <PostCard post={post} />) : <p>No posts published yet.</p>}
+<div class="post-list">{posts.length ? posts.map((post) => <PostCard post={post} />) : <p>No posts published yet.</p>}</div>
