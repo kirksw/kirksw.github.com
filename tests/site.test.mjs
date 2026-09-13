@@ -17,8 +17,8 @@ test('production output contains every legacy feed route', async () => {
 test('production output excludes the draft from every generated surface', async () => {
   const files = ['index.html', 'index.xml', 'index.json', 'posts/index.xml', 'tags/index.xml', 'sitemap.xml'];
   const content = (await Promise.all(files.map((file) => readFile(`${buildDir}/${file}`, 'utf8')))).join('\\n');
-  assert.doesNotMatch(content, /mill-jvm-builds|sbt 2 Is Here/);
-  await assert.rejects(stat(`${buildDir}/posts/mill-jvm-builds/index.html`));
+  assert.doesNotMatch(content, /__test-draft-fixture|Private draft fixture|private-draft-tag/);
+  await assert.rejects(stat(`${buildDir}/posts/__test-draft-fixture/index.html`));
 });
 
 test('production output retains post image links and copied assets', async () => {
@@ -83,4 +83,12 @@ test('navigation exposes current location and avoids overlay controls', async ()
   assert.match(writing, /aria-current="page"/);
   assert.doesNotMatch(article, /accesskey=|class="top-link"/);
   assert.match(article, /Back to top/);
+});
+
+
+test('Mill article is published with the custom-domain canonical URL', async () => {
+  const page = await readFile(`${buildDir}/posts/mill-jvm-builds/index.html`, 'utf8');
+  assert.match(page, /https:\/\/cntd\.io\/posts\/mill-jvm-builds\//);
+  const index = JSON.parse(await readFile(`${buildDir}/index.json`, 'utf8'));
+  assert.ok(index.some((post) => post.permalink === '/posts/mill-jvm-builds/'));
 });

@@ -4,6 +4,9 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const output = await mkdtemp(join(tmpdir(), 'astro-test-'));
+const draftDir = 'src/content/posts/__test-draft-fixture';
+await mkdir(draftDir);
+await writeFile(join(draftDir, 'index.md'), '---\ntitle: Private draft fixture\ndate: 2024-01-01\ndraft: true\ntags: [private-draft-tag]\n---\n\nUnpublished fixture content.\n');
 const fixtureDir = 'src/content/posts/__test-mdx-fixture';
 await mkdir(fixtureDir);
 await writeFile(join(fixtureDir, 'index.mdx'), `---\ntitle: MDX fixture\ndate: 2024-01-01\ndraft: false\ntags: [test]\n---\n\nexport const greeting = "Rendered MDX expression";\n\n## Fixture heading\n\n<span>{greeting}</span>\n\nThis fixture proves MDX compilation.\n`);
@@ -18,5 +21,6 @@ try {
   run(process.execPath, ['scripts/validate-content.mjs', output]);
 } finally {
   await rm(output, { recursive: true, force: true });
+  await rm(draftDir, { recursive: true, force: true });
   await rm(fixtureDir, { recursive: true, force: true });
 }

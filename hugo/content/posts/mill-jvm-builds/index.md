@@ -1,7 +1,7 @@
 ---
 title: "sbt 2 Is Here. Why Consider Mill?"
 date: 2026-09-13T21:00:00+02:00
-draft: true
+draft: false
 tags: ["scala", "jvm", "flink", "build-tools", "mill"]
 summary: "sbt 2 improves how builds execute. Mill offers a reason to reconsider how we understand them, especially when a Flink application needs more than compilation and tests."
 ---
