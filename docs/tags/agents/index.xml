@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Agents on MDS</title>
+    <link>https://kirksw.github.io/tags/agents/</link>
+    <description>Recent content in Agents on MDS</description>
+    <image>
+      <url>https://kirksw.github.io/logo.png</url>
+      <link>https://kirksw.github.io/logo.png</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 13 Sep 2026 20:00:00 +0200</lastBuildDate><atom:link href="https://kirksw.github.io/tags/agents/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Agentic SDLC</title>
+      <link>https://kirksw.github.io/posts/agentic-sdlc/</link>
+      <pubDate>Sun, 13 Sep 2026 20:00:00 +0200</pubDate>
+      
+      <guid>https://kirksw.github.io/posts/agentic-sdlc/</guid>
+      <description>A philosophy for software development where humans and agents share the same context, tools, workflows, and quality bar.</description>
+      <content:encoded><![CDATA[<p>Agents are an ephemeral workforce. They arrive without institutional memory, perform work, and disappear. This makes durable context more important than ever.</p>
+<p>An Agentic SDLC gives human and agent developers the same working substrate: documented intent, architecture, conventions, current state, operational knowledge, reproducible environments, and observable workflows. Both are held to the same project-defined quality bar, and either should be able to enter or leave a workflow without losing its state.</p>
+<p>The system should support precise human control, highly leveraged agent execution, and every point between them. Humans choose the altitude; the system manages the coordination complexity.</p>
+<p><img loading="lazy" src="/posts/agentic-sdlc/images/agentic-sdlc-infographic.webp" type="" alt="The Agentic SDLC operating model"  /></p>
+<h2 id="the-core-ideas">The core ideas</h2>
+<ul>
+<li><strong>Work belongs to the workflow.</strong> Plans, decisions, evidence, authority, and outcomes persist independently of the worker or conversation.</li>
+<li><strong>Development is composable.</strong> Intent, planning, execution, verification, integration, observation, and learning are reusable primitives rather than one mandatory pipeline.</li>
+<li><strong>Context is federated.</strong> Repositories, planning tools, documentation, deployments, incidents, logs, traces, and metrics remain connected with provenance.</li>
+<li><strong>Production closes the loop.</strong> Runtime evidence can diagnose failures, validate changes, measure goals, and trigger governed remediation.</li>
+<li><strong>Known rules become deterministic gates.</strong> Judgment and autonomy then scale with the maturity and risk of the work.</li>
+<li><strong>Tools serve humans and agents.</strong> Markdown, CLIs, reproducible environments, machine-readable contracts, and rich multimodal artifacts provide a shared and inspectable foundation.</li>
+</ul>
+<p>The goal is a system that is fit for purpose. It should avoid both unstructured vibe coding and orchestration complexity for its own sake, while leaving room to compose more powerful development systems from understandable parts.</p>
+<h2 id="explore-the-philosophy">Explore the philosophy</h2>
+<p><a href="/agentic-sdlc/">Open the immersive Agentic SDLC overview</a></p>
+<p>The underlying philosophy and future protocols are being developed in the <a href="https://github.com/kirksw/agentic-sdlc">agentic-sdlc repository</a>.</p>
+]]></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
