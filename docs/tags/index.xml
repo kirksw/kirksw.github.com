@@ -10,7 +10,47 @@
     </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 27 Jul 2024 12:50:29 +0200</lastBuildDate><atom:link href="https://kirksw.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 13 Sep 2026 20:00:00 +0200</lastBuildDate><atom:link href="https://kirksw.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Agents</title>
+      <link>https://kirksw.github.io/tags/agents/</link>
+      <pubDate>Sun, 13 Sep 2026 20:00:00 +0200</pubDate>
+      
+      <guid>https://kirksw.github.io/tags/agents/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>Ai</title>
+      <link>https://kirksw.github.io/tags/ai/</link>
+      <pubDate>Sun, 13 Sep 2026 20:00:00 +0200</pubDate>
+      
+      <guid>https://kirksw.github.io/tags/ai/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>Sdlc</title>
+      <link>https://kirksw.github.io/tags/sdlc/</link>
+      <pubDate>Sun, 13 Sep 2026 20:00:00 +0200</pubDate>
+      
+      <guid>https://kirksw.github.io/tags/sdlc/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
+    <item>
+      <title>Software-Development</title>
+      <link>https://kirksw.github.io/tags/software-development/</link>
+      <pubDate>Sun, 13 Sep 2026 20:00:00 +0200</pubDate>
+      
+      <guid>https://kirksw.github.io/tags/software-development/</guid>
+      <description></description>
+      <content:encoded><![CDATA[]]></content:encoded>
+    </item>
+    
     <item>
       <title>Kubernetes</title>
       <link>https://kirksw.github.io/tags/kubernetes/</link>
