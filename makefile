@@ -1,7 +1,8 @@
 serve:
-	cd hugo && hugo -D server
+	npm run dev
 
 build:
-	rm -rf docs/*
-	cd hugo && hugo
-	cp -r hugo/public/* docs/
+	npm run build
+
+check:
+	npm run check && npm test

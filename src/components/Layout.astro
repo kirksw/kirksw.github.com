@@ -1,0 +1,10 @@
+---
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import '../styles/papermodx.css';
+import '../styles/site.css';
+interface Props { title?: string; description?: string; type?: string; }
+const { title = 'MDS', description = 'Reference articles around data engineering/software', type = 'website' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html><html lang="en" dir="auto"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="description" content={description} /><title>{title} | MDS</title><link rel="canonical" href={canonical} /><link rel="icon" href="/logo.png" /><meta property="og:title" content={title} /><meta property="og:description" content={description} /><meta property="og:type" content={type} /></head><body id="top" class="list"><Header /><main class="main"><slot /></main><Footer /><a href="#top" class="top-link" aria-label="Back to top">↑</a></body></html>

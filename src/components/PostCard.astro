@@ -1,0 +1,6 @@
+---
+import type { Post } from '../lib/posts';
+import { excerpt, postUrl } from '../lib/posts';
+const { post } = Astro.props as { post: Post };
+---
+<article class="post-entry"><header class="entry-header"><h2>{post.data.title}</h2></header><div class="entry-content">{excerpt(post)}</div><footer class="entry-footer"><time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>{post.data.draft && <span> · draft</span>}</footer><a class="entry-link" aria-label={post.data.title} href={postUrl(post)}></a></article>

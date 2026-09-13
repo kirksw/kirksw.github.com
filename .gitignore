@@ -1,0 +1,6 @@
+.direnv/
+node_modules/
+dist/
+.astro/
+hugo/.hugo_build.lock
+hugo/resources/_gen/
